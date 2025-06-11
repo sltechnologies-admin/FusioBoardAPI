@@ -1,0 +1,6 @@
+E:\SSTechnologies\souceCode\webapi\FusionBoard\SQLDb\bin\Debug\SQLDb.dacpac
+E:\SSTechnologies\souceCode\webapi\FusionBoard\SQLDb\bin\Debug\SQLDb.dll
+E:\SSTechnologies\souceCode\webapi\FusionBoard\SQLDb\bin\Debug\SQLDb.pdb
+E:\SSTechnologies\souceCode\webapi\FusionBoard\SQLDb\obj\Debug\SQLDb.sqlproj.AssemblyReference.cache
+E:\SSTechnologies\souceCode\webapi\FusionBoard\SQLDb\obj\Debug\SQLDb.dll
+E:\SSTechnologies\souceCode\webapi\FusionBoard\SQLDb\obj\Debug\SQLDb.pdb

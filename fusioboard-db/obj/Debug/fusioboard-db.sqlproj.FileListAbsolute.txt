@@ -1,0 +1,6 @@
+E:\SSTechnologies\souceCode\webapi\FusionBoard\fusioboard-db\bin\Debug\fusioboard-db.dacpac
+E:\SSTechnologies\souceCode\webapi\FusionBoard\fusioboard-db\bin\Debug\fusioboard_db.dll
+E:\SSTechnologies\souceCode\webapi\FusionBoard\fusioboard-db\bin\Debug\fusioboard_db.pdb
+E:\SSTechnologies\souceCode\webapi\FusionBoard\fusioboard-db\obj\Debug\fusioboard-db.sqlproj.AssemblyReference.cache
+E:\SSTechnologies\souceCode\webapi\FusionBoard\fusioboard-db\obj\Debug\fusioboard_db.dll
+E:\SSTechnologies\souceCode\webapi\FusionBoard\fusioboard-db\obj\Debug\fusioboard_db.pdb
