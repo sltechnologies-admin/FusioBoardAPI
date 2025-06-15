@@ -1,4 +1,5 @@
 ﻿using API.Common.Logging;
+using API.Constants;
 using API.Controllers;
 using API.DAL.DTO;
 using API.Data.Interfaces;
@@ -6,23 +7,24 @@ using API.Models.Requests;
 using API.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Data.SqlClient;
-using Microsoft.Extensions.Logging;
 
 public class AuthController : BaseController
 {
     private readonly IDatabaseService _db;
+
     private readonly IAuthService _authService;
     private readonly IAppLogger<AuthController> _logger;
     private readonly ISqlLogger _sqlLogger;
 
-    public AuthController(IAppLogger<AuthController> logger, IDatabaseService db, IAuthService authService,
-ISqlLogger sqlLogger)
+    public AuthController( IDatabaseService db, ISqlLogger sqlLogger, IAppLogger<AuthController> logger, IAuthService authService)
     {
+        //coomon 
         _db = db;
-        _authService = authService;
-
-        _logger = logger;
         _sqlLogger = sqlLogger;
+        _logger = logger;
+
+        //specific 
+        _authService = authService;
     }
 
     /// <summary>
@@ -44,19 +46,15 @@ ISqlLogger sqlLogger)
                 return BadRequest(new { message = result.ErrorMessage });
 
             _logger.LogInformation("[REG-SUCCESS-01] CorrelationId: {CorrelationId} - User registered: {Email}", CorrelationId, request.Email);
-            return Ok(new { message = "User registered successfully." });
+            return Ok(new { message = Messages.Auth.s_UserRegSuccess });
         }
         catch (Exception ex)
         {
             var eventCode = "REG-ERR-01";
-            await LogHelper.LogErrorAsync(_sqlLogger, eventCode,CorrelationId,
-                   "Unexpected error during registration.",
-                   ex
-               );
-            return StatusCode(500, new { message = "An unexpected error occurred.", correlationId = CorrelationId });
+            await LogHelper.LogErrorAsync(_sqlLogger, eventCode,CorrelationId,Messages.Auth.e_UnexpectedRegistrationError,ex);
+            return StatusCode(HttpStatusCodes.InternalServerError, new { message = "An unexpected error occurred.", correlationId = CorrelationId });
         }
     }
-
 
     [HttpPost("login")]
     public async Task<IActionResult> Login([FromBody] LoginRequest request)
@@ -76,7 +74,7 @@ ISqlLogger sqlLogger)
 
         if (result.Rows.Count == 0)
         {
-            return Unauthorized(new { message = "Invalid username or password." });
+            return Unauthorized(new { message = Messages.Auth.i_InvalidUserNameOrPwd });
         }
 
         var user = result.Rows[0];
@@ -89,7 +87,6 @@ ISqlLogger sqlLogger)
             Message = "Login successful"
         });
     }
-
 
     [HttpPost("change-password")]
     public async Task<IActionResult> ChangePassword([FromBody] ChangePasswordRequest request)
@@ -106,13 +103,13 @@ ISqlLogger sqlLogger)
     });
 
         if (table.Rows.Count == 0)
-            return NotFound(new { message = "User not found." });
+            return NotFound(new { message =Messages.Auth.i_UserNotFound });
 
         var currentPassword = table.Rows[0]["PasswordHash"].ToString();
 
         // 2. Compare plain text passwords
         if (currentPassword != request.OldPassword)
-            return BadRequest(new { message = "Old password is incorrect." });
+            return BadRequest(new { message = Messages.Auth.i_OldPwdIncorrect });
 
         // 3. Update password to new one
         var updateQuery = @"
@@ -129,9 +126,9 @@ ISqlLogger sqlLogger)
     });
 
         if (rowsAffected == 0)
-            return StatusCode(500, new { message = "Password update failed." });
+            return StatusCode(HttpStatusCodes.InternalServerError, new { message = Messages.Auth.e_PwdUpdateFailed });
 
-        return Ok(new { message = "Password changed successfully." });
+        return Ok(new { message = Messages.Auth.s_PwdUpdateSuccess });
     }
 
 

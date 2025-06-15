@@ -1,4 +1,5 @@
-﻿using API.DAL.DTO;
+﻿using API.Constants;
+using API.DAL.DTO;
 using API.Data;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Data.SqlClient;
@@ -65,11 +66,11 @@ namespace API.Controllers
             }
             catch (SqlException ex)
             {
-                return StatusCode(500, new { error = "Database error", detail = ex.Message });
+                return StatusCode(HttpStatusCodes.InternalServerError, new { error = "Database error", detail = ex.Message });
             }
             catch (Exception ex)
             {
-                return StatusCode(500, new { error = "Unexpected error", detail = ex.Message });
+                return StatusCode(HttpStatusCodes.InternalServerError, new { error = "Unexpected error", detail = ex.Message });
             }
         }
 
@@ -139,11 +140,11 @@ namespace API.Controllers
             catch (SqlException ex)
             {
                 // Log if needed
-                return StatusCode(500, new { error = "Database error", detail = ex.Message });
+                return StatusCode(HttpStatusCodes.InternalServerError, new { error = "Database error", detail = ex.Message });
             }
             catch (Exception ex)
             {
-                return StatusCode(500, new { error = "Unexpected error", detail = ex.Message });
+                return StatusCode(HttpStatusCodes.InternalServerError, new { error = "Unexpected error", detail = ex.Message });
             }
         }
 
@@ -184,11 +185,11 @@ namespace API.Controllers
             }
             catch (SqlException ex)
             {
-                return StatusCode(500, new { error = "Database error", detail = ex.Message });
+                return StatusCode(HttpStatusCodes.InternalServerError, new { error = "Database error", detail = ex.Message });
             }
             catch (Exception ex)
             {
-                return StatusCode(500, new { error = "Unexpected error", detail = ex.Message });
+                return StatusCode(HttpStatusCodes.InternalServerError, new { error = "Unexpected error", detail = ex.Message });
             }
         }
         /*
@@ -241,7 +242,7 @@ namespace API.Controllers
 
                         if (result == 0)
                         {
-                            return StatusCode(500, new { message = "Failed to create release." });
+                            return StatusCode(HttpStatusCodes.InternalServerError, new { message = "Failed to create release." });
                         }
 
                         return Ok(new {
@@ -251,7 +252,7 @@ namespace API.Controllers
                     }
                     catch (Exception ex)
                     {
-                        return StatusCode(500, new { message = "An error occurred.", error = ex.Message });
+                        return StatusCode(HttpStatusCodes.InternalServerError, new { message = "An error occurred.", error = ex.Message });
                     }
                 }
 

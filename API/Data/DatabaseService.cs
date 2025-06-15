@@ -6,7 +6,7 @@ namespace API.Data
 {
     public class DatabaseService : IDatabaseService
     {
-        private readonly string _connectionString;
+        private readonly string? _connectionString;
 
         public DatabaseService(IConfiguration configuration)
         {

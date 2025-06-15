@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using API.Constants;
+using Microsoft.AspNetCore.Mvc;
 
 namespace API.Controllers
 {
@@ -7,7 +8,7 @@ namespace API.Controllers
     public abstract class BaseController : ControllerBase
     {
         protected string CorrelationId =>
-            HttpContext?.Items["X-Correlation-ID"]?.ToString() ?? Guid.NewGuid().ToString();
+            HttpContext?.Items[HeaderKeys.CorrelationId]?.ToString() ?? Guid.NewGuid().ToString();
     }
 
 

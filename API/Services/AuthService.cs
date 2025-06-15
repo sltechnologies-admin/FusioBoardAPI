@@ -1,4 +1,5 @@
-﻿using API.Models.Requests;
+﻿using API.Constants;
+using API.Models.Requests;
 using API.Repositories.Interfaces;
 using API.Services.Interfaces;
 
@@ -17,7 +18,7 @@ namespace API.Services
         {
             var exists = await _authRepository.UserExistsAsync(request.Email, request.Username);
             if (exists)
-                return (false, "Email or Username already exists.");
+                return (false, Messages.Auth.i_UserAlreadyExists);
 
             await _authRepository.InsertUserAsync(request);
             return (true, null);
