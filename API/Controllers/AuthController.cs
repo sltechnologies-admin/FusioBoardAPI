@@ -1,84 +1,60 @@
-﻿using API.DAL;
+﻿using API.Common.Logging;
+using API.Controllers;
 using API.DAL.DTO;
-using API.Models;
-
-//using Microsoft.AspNetCore.Identity.Data;
-//using Microsoft.AspNetCore.Identity;
+using API.Data.Interfaces;
+using API.Models.Requests;
+using API.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
-using System.Data.SqlClient;
+using Microsoft.Data.SqlClient;
+using Microsoft.Extensions.Logging;
 
-[ApiController]
-[Route("api/auth")]
-public class AuthController : ControllerBase
+public class AuthController : BaseController
 {
-    private readonly DbHelper _db;
+    private readonly IDatabaseService _db;
+    private readonly IAuthService _authService;
+    private readonly IAppLogger<AuthController> _logger;
+    private readonly ISqlLogger _sqlLogger;
 
-    public AuthController(DbHelper db)
+    public AuthController(IAppLogger<AuthController> logger, IDatabaseService db, IAuthService authService,
+ISqlLogger sqlLogger)
     {
         _db = db;
+        _authService = authService;
+
+        _logger = logger;
+        _sqlLogger = sqlLogger;
     }
+
+    /// <summary>
+    /// SignUp User
+    /// </summary>
+    /// <param name="request">Login credentials.</param>
+    /// <returns>JWT token on success, error message on failure.</returns>
 
     [HttpPost("register")]
     public async Task<IActionResult> Register([FromBody] RegisterRequest request)
     {
+        if (!ModelState.IsValid)
+            return BadRequest(ModelState);
+
         try
         {
+            var result = await _authService.RegisterUserAsync(request);
+            if (!result.Success)
+                return BadRequest(new { message = result.ErrorMessage });
 
-       
-        // 1. Check for existing user
-        var emailCheckQuery = "SELECT COUNT(1) FROM Users WHERE Email = @Email OR Username = @Username";
-        var count = (int)await _db.ExecuteScalarAsync(emailCheckQuery, new List<SqlParameter>
-        {
-            new SqlParameter("@Email", request.Email),
-            new SqlParameter("@Username", request.Username)
-        });
-
-        if (count > 0)
-            return BadRequest(new { message = "Email or Username already exists." });
-
-        // 2. Insert new user
-        var insertQuery = @"
-            INSERT INTO Users (
-                 Username, Email, PasswordHash,
-                FirstName, MiddleName, LastName,
-                CreatedAt, UpdatedAt, IsActive
-            )
-            VALUES (
-                 @Username, @Email, @PasswordHash,
-                @FirstName, @MiddleName, @LastName,
-                @CreatedAt, @UpdatedAt, @IsActive
-            )";
-
-        //var userId = Guid.NewGuid();
-
-       //Random random = new Random();
-       //int userId = random.Next(1, 101); // 1 to 100 inclusive
-         var now = DateTime.UtcNow;
-
-            var parameters = new List<SqlParameter>
-              {
-    // new SqlParameter("@UserId", userId), // Uncomment if needed
-                 new SqlParameter("@Username", request.Username),
-                 new SqlParameter("@Email", request.Email),
-                 new SqlParameter("@PasswordHash", request.Password),
-                 new SqlParameter("@FirstName", request.FirstName),
-                 new SqlParameter("@MiddleName", string.IsNullOrEmpty(request.MiddleName)
-                     ? DBNull.Value
-                     : request.MiddleName),
-                 new SqlParameter("@LastName", request.LastName),
-                 new SqlParameter("@CreatedAt", now),
-                 new SqlParameter("@UpdatedAt", now),
-                 new SqlParameter("@IsActive", true)
-                };
-
-            await _db.ExecuteNonQueryAsync(insertQuery, parameters);
-
+            _logger.LogInformation("[REG-SUCCESS-01] CorrelationId: {CorrelationId} - User registered: {Email}", CorrelationId, request.Email);
+            return Ok(new { message = "User registered successfully." });
         }
         catch (Exception ex)
         {
-            throw ex.InnerException;
+            var eventCode = "REG-ERR-01";
+            await LogHelper.LogErrorAsync(_sqlLogger, eventCode,CorrelationId,
+                   "Unexpected error during registration.",
+                   ex
+               );
+            return StatusCode(500, new { message = "An unexpected error occurred.", correlationId = CorrelationId });
         }
-        return Ok(new { message = "User registered successfully."});
     }
 
 
@@ -105,8 +81,9 @@ public class AuthController : ControllerBase
 
         var user = result.Rows[0];
 
-        return Ok(new LoginResponse {
-            UserId = Convert.ToInt32(user["UserId"]) ,
+        return Ok(new LoginResponse
+        {
+            UserId = Convert.ToInt32(user["UserId"]),
             Username = user["Username"].ToString(),
             Email = user["Email"].ToString(),
             Message = "Login successful"

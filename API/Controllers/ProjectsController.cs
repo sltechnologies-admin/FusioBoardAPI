@@ -1,7 +1,7 @@
-﻿using API.DAL;
-using API.DAL.DTO;
+﻿using API.DAL.DTO;
+using API.Data;
 using Microsoft.AspNetCore.Mvc;
-using System.Data.SqlClient;
+using Microsoft.Data.SqlClient;
 
 
 
@@ -9,18 +9,22 @@ using System.Data.SqlClient;
 
 namespace API.Controllers
 {
-    public class ProjectsController : ControllerBase
+    public class ProjectsController : BaseController
     {
-        private readonly DbHelper _db;
+        private readonly DatabaseService _db;
 
-        public ProjectsController(DbHelper db)
+        public ProjectsController(DatabaseService db)
         {
             _db = db;
         }
 
 
- 
-        [HttpPost("api/projects")]
+        /// <summary>
+        /// Create a new project
+        /// </summary>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        [HttpPost("create")]
         public async Task<IActionResult> CreateProject([FromBody] CreateProjectRequest request)
         {
             if (string.IsNullOrWhiteSpace(request.ProjectName))
@@ -49,7 +53,8 @@ namespace API.Controllers
             {
                 var projectId = (int)await _db.ExecuteScalarAsync(insertQuery, parameters);
 
-                return Ok(new {
+                return Ok(new
+                {
                     message = "Project created successfully.",
                     projectId
                 });
@@ -76,7 +81,7 @@ namespace API.Controllers
         /// <param name="projectId"></param>
         /// <param name="request"></param>
         /// <returns></returns>
-        [HttpPost("api/projects/{projectId}/users/assign-role")]
+        [HttpPost("{projectId}/users/assign-role")]
         public async Task<IActionResult> AssignRoleToUser(int projectId, [FromBody] AssignRoleRequest request)
         {
             if (request == null || request.UserId <= 0 || request.RoleId <= 0)
@@ -142,8 +147,13 @@ namespace API.Controllers
             }
         }
 
+        /// <summary>
+        /// View project summary/details
+        /// </summary>
+        /// <param name="projectId"></param>
+        /// <returns></returns>
 
-        [HttpGet("api/projects/{projectId}/users/roles")]
+        [HttpGet("{projectId}/users/roles")]
         public async Task<IActionResult> GetAssignedUsersAndRoles(int projectId)
         {
             try
@@ -181,7 +191,71 @@ namespace API.Controllers
                 return StatusCode(500, new { error = "Unexpected error", detail = ex.Message });
             }
         }
+        /*
+                #region release 
+                [HttpPost("api/projects/{projectId}/releases")]
+                public async Task<IActionResult> CreateRelease(int projectId, [FromBody] CreateReleaseRequest request)
+                {
+                    // Step 1: Check for existing release name in the project
+                    string checkQuery = @"
+                SELECT COUNT(*) FROM Releases 
+                WHERE ProjectId = @ProjectId AND ReleaseName = @ReleaseName";
+
+                    var checkParams = new List<SqlParameter>
+                    {
+                new SqlParameter("@ProjectId", projectId),
+                new SqlParameter("@ReleaseName", request.ReleaseName)
+            };
+
+                    try
+                    {
+                        var count = (int)await _db.ExecuteScalarAsync(checkQuery, checkParams);
 
 
+                        if (count > 0)
+                        {
+                            return Conflict(new {
+                                message = "A release with the same name already exists in this project."
+                            });
+                        }
+
+                        // Step 2: Generate new ReleaseId (auto-increment if DB doesn't handle it)
+                        string idQuery = "SELECT ISNULL(MAX(ReleaseId), 0) + 1 FROM Releases";
+                        int newReleaseId = await _db.ExecuteScalarAsync<int>(idQuery);
+
+                        // Step 3: Insert release
+                        string insertQuery = @"
+                    INSERT INTO Releases (ReleaseId, ProjectId, ReleaseName, ReleaseDate, Description, CreatedAt)
+                    VALUES (@ReleaseId, @ProjectId, @ReleaseName, @ReleaseDate, @Description, SYSDATETIMEOFFSET())";
+
+                        var insertParams = new List<SqlParameter>
+                        {
+                    new SqlParameter("@ReleaseId", newReleaseId),
+                    new SqlParameter("@ProjectId", projectId),
+                    new SqlParameter("@ReleaseName", request.ReleaseName),
+                    new SqlParameter("@ReleaseDate", request.ReleaseDate ?? (object)DBNull.Value),
+                    new SqlParameter("@Description", string.IsNullOrEmpty(request.Description) ? DBNull.Value : request.Description)
+                };
+
+                        int result = await _db.ExecuteNonQueryAsync(insertQuery, insertParams);
+
+                        if (result == 0)
+                        {
+                            return StatusCode(500, new { message = "Failed to create release." });
+                        }
+
+                        return Ok(new {
+                            message = "Release created successfully.",
+                            releaseId = newReleaseId
+                        });
+                    }
+                    catch (Exception ex)
+                    {
+                        return StatusCode(500, new { message = "An error occurred.", error = ex.Message });
+                    }
+                }
+
+                #endregion 
+        */
     }
 }
