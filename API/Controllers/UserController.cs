@@ -8,15 +8,15 @@ using API.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Data.SqlClient;
 
-public class AuthController : BaseController
+public class UserController : BaseController
 {
     private readonly IDatabaseService _db;
 
-    private readonly IAuthService _authService;
-    private readonly IAppLogger<AuthController> _logger;
+    private readonly IUserService _authService;
+    private readonly IAppLogger<UserController> _logger;
     private readonly ISqlLogger _sqlLogger;
 
-    public AuthController( IDatabaseService db, ISqlLogger sqlLogger, IAppLogger<AuthController> logger, IAuthService authService)
+    public UserController( IDatabaseService db, ISqlLogger sqlLogger, IAppLogger<UserController> logger, IUserService authService)
     {
         //coomon 
         _db = db;
@@ -28,9 +28,9 @@ public class AuthController : BaseController
     }
 
     /// <summary>
-    /// SignUp User
+    /// Sign Up
     /// </summary>
-    /// <param name="request">Login credentials.</param>
+    /// <param name="request">RegisterRequest</param>
     /// <returns>JWT token on success, error message on failure.</returns>
 
     [HttpPost("register")]
@@ -46,16 +46,21 @@ public class AuthController : BaseController
                 return BadRequest(new { message = result.ErrorMessage });
 
             _logger.LogInformation("[REG-SUCCESS-01] CorrelationId: {CorrelationId} - User registered: {Email}", CorrelationId, request.Email);
-            return Ok(new { message = Messages.Auth.s_UserRegSuccess });
+            return Ok(new { message = Messages.User.s_UserRegSuccess });
         }
         catch (Exception ex)
         {
             var eventCode = "REG-ERR-01";
-            await LogHelper.LogErrorAsync(_sqlLogger, eventCode,CorrelationId,Messages.Auth.e_UnexpectedRegistrationError,ex);
+            await LogHelper.LogErrorAsync(_sqlLogger, eventCode,CorrelationId,Messages.User.e_UnexpectedRegistrationError,ex);
             return StatusCode(HttpStatusCodes.InternalServerError, new { message = "An unexpected error occurred.", correlationId = CorrelationId });
         }
     }
 
+    /// <summary>
+    /// Log in
+    /// </summary>
+    /// <param name="request">LoginRequest</param>
+    /// <returns></returns>
     [HttpPost("login")]
     public async Task<IActionResult> Login([FromBody] LoginRequest request)
     {
@@ -74,7 +79,7 @@ public class AuthController : BaseController
 
         if (result.Rows.Count == 0)
         {
-            return Unauthorized(new { message = Messages.Auth.i_InvalidUserNameOrPwd });
+            return Unauthorized(new { message = Messages.User.i_InvalidUserNameOrPwd });
         }
 
         var user = result.Rows[0];
@@ -82,8 +87,8 @@ public class AuthController : BaseController
         return Ok(new LoginResponse
         {
             UserId = Convert.ToInt32(user["UserId"]),
-            Username = user["Username"].ToString(),
-            Email = user["Email"].ToString(),
+            Username = user["Username"]?.ToString() ?? string.Empty,
+            Email = user["Email"]?.ToString() ?? string.Empty,
             Message = "Login successful"
         });
     }
@@ -103,13 +108,13 @@ public class AuthController : BaseController
     });
 
         if (table.Rows.Count == 0)
-            return NotFound(new { message =Messages.Auth.i_UserNotFound });
+            return NotFound(new { message =Messages.User.i_UserNotFound });
 
         var currentPassword = table.Rows[0]["PasswordHash"].ToString();
 
         // 2. Compare plain text passwords
         if (currentPassword != request.OldPassword)
-            return BadRequest(new { message = Messages.Auth.i_OldPwdIncorrect });
+            return BadRequest(new { message = Messages.User.i_OldPwdIncorrect });
 
         // 3. Update password to new one
         var updateQuery = @"
@@ -126,9 +131,9 @@ public class AuthController : BaseController
     });
 
         if (rowsAffected == 0)
-            return StatusCode(HttpStatusCodes.InternalServerError, new { message = Messages.Auth.e_PwdUpdateFailed });
+            return StatusCode(HttpStatusCodes.InternalServerError, new { message = Messages.User.e_PwdUpdateFailed });
 
-        return Ok(new { message = Messages.Auth.s_PwdUpdateSuccess });
+        return Ok(new { message = Messages.User.s_PwdUpdateSuccess });
     }
 
 

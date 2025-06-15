@@ -1,25 +1,17 @@
 ﻿namespace API.Models
 {
-    public class AuthIdentity
-    {
-    }
-
     public class User
     {
         public int Id { get; set; }
-        public string Email { get; set; }
-        public string PasswordHash { get; set; }
+        public required string Email { get; set; }
+        public required string PasswordHash { get; set; }
         public ICollection<UserProjectRole> ProjectRoles { get; set; }
-
-
     }
-
-
 
     public class Role
     {
         public int Id { get; set; }
-        public string Name { get; set; }
+        public required string Name { get; set; }
         public ICollection<RolePermission> Permissions { get; set; }
     }
 
@@ -38,7 +30,7 @@
     public class Permission
     {
         public int Id { get; set; }
-        public string Name { get; set; }
+        public required string Name { get; set; }
     }
 
     public class RolePermission

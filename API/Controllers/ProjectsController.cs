@@ -12,9 +12,9 @@ namespace API.Controllers
 {
     public class ProjectsController : BaseController
     {
-        private readonly DatabaseService _db;
+        private readonly SqlDatabaseService _db;
 
-        public ProjectsController(DatabaseService db)
+        public ProjectsController(SqlDatabaseService db)
         {
             _db = db;
         }

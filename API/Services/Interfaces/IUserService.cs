@@ -3,7 +3,7 @@ using Azure.Core;
 
 namespace API.Services.Interfaces
 {
-    public interface IAuthService
+    public interface IUserService
     {
         Task<(bool Success, string ErrorMessage)> RegisterUserAsync(RegisterRequest request);
     }

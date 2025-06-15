@@ -4,7 +4,7 @@ namespace API.Constants
 {
     public static class Messages
     {
-        public static class Auth
+        public static class User
         {
             // Success
             public const string s_UserRegSuccess = "User registered successfully.";

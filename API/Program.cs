@@ -16,9 +16,9 @@ builder.Services.AddControllers();
 
 
 // Register here
-builder.Services.AddScoped<IDatabaseService, DatabaseService>();
-builder.Services.AddScoped<IAuthService, AuthService>();
-builder.Services.AddScoped<IAuthRepository, AuthRepository>();
+builder.Services.AddScoped<IDatabaseService, SqlDatabaseService>();
+builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped(typeof(IAppLogger<>), typeof(AppLogger<>));
 builder.Services.AddScoped<ISqlLogger, SqlLogger>();
 
@@ -29,7 +29,7 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 //for DAL 
-builder.Services.AddSingleton<DatabaseService>();
+builder.Services.AddSingleton<SqlDatabaseService>();
 
 builder.Services.AddSwaggerGen(c =>
 {

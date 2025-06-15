@@ -6,11 +6,11 @@ using System.Data;
 
 namespace API.Repositories
 {
-    public class AuthRepository : IAuthRepository
+    public class UserRepository : IUserRepository
     {
         private readonly IDatabaseService _db;
 
-        public AuthRepository(IDatabaseService db)
+        public UserRepository(IDatabaseService db)
         {
             _db = db;
         }

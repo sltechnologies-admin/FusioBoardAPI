@@ -5,11 +5,11 @@ using API.Services.Interfaces;
 
 namespace API.Services
 {
-    public class AuthService : IAuthService
+    public class UserService : IUserService
     {
-        private readonly IAuthRepository _authRepository;
+        private readonly IUserRepository _authRepository;
 
-        public AuthService(IAuthRepository AuthRepository)
+        public UserService(IUserRepository AuthRepository)
         {
             _authRepository = AuthRepository;
         }
@@ -18,7 +18,7 @@ namespace API.Services
         {
             var exists = await _authRepository.UserExistsAsync(request.Email, request.Username);
             if (exists)
-                return (false, Messages.Auth.i_UserAlreadyExists);
+                return (false, Messages.User.i_UserAlreadyExists);
 
             await _authRepository.InsertUserAsync(request);
             return (true, null);
