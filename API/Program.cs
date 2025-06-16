@@ -9,6 +9,24 @@ using API.Services.Interfaces;
 using System.Reflection;
 
 var builder = WebApplication.CreateBuilder(args);
+builder.Services.AddCors(options =>
+{
+    //options.AddPolicy("AllowFrontend",
+    //policy =>
+    //{
+    //    policy.WithOrigins("*")//            "https://http://localhost:3001.com") // or "*"
+    //          .AllowAnyHeader()
+    //          .AllowAnyMethod();
+    //});
+    //Replace .AllowAnyOrigin() with .WithOrigins("http://localhost:4200") or your actual frontend domain.
+    options.AddPolicy("AllowAll", policy =>
+    {
+        policy
+            .AllowAnyOrigin()
+            .AllowAnyHeader()
+            .AllowAnyMethod();
+    });
+});
 
 // Add services to the container.
 
@@ -50,6 +68,8 @@ app.UseSwaggerUI();
 //}
 
 app.UseHttpsRedirection();
+
+app.UseCors("AllowAll"); // Must come before UseAuthorization()
 
 app.UseAuthorization();
 
