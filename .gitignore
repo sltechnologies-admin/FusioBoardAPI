@@ -170,3 +170,5 @@
 /fusioboard-db/bin/Release/fusioboard_db.pdb
 /API/bin/Release/net8.0
 /API/obj/Release/net8.0
+/fusioboadDbPrjt/obj/Debug
+/fusioboadDbPrjt/bin/Debug
