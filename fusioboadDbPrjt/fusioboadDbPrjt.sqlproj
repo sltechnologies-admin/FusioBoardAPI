@@ -56,26 +56,11 @@
   <Import Condition="'$(SQLDBExtensionsRefPath)' == ''" Project="$(MSBuildExtensionsPath)\Microsoft\VisualStudio\v$(VisualStudioVersion)\SSDT\Microsoft.Data.Tools.Schema.SqlTasks.targets" />
   <ItemGroup>
     <Folder Include="Properties" />
-    <Folder Include="Tables" />
     <Folder Include="dbo\" />
     <Folder Include="dbo\Tables\" />
+    <Folder Include="dbo\Stored Procedures\" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Tables\Epics.sql" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Tables\Features.sql" />
-    <None Include="Tables\Logs.sql" />
-    <None Include="Tables\Permissions.sql" />
-    <None Include="Tables\Projects.sql" />
-    <None Include="Tables\Releases.sql" />
-    <None Include="Tables\RolePermission.sql" />
-    <None Include="Tables\Roles.sql" />
-    <None Include="Tables\Sprints.sql" />
-    <None Include="Tables\Stories.sql" />
-    <None Include="Tables\UserProjectRoles.sql" />
-    <None Include="Tables\Users.sql" />
-    <None Include="Tables\AuditLogs.sql" />
     <Build Include="dbo\Tables\Users.sql" />
     <Build Include="dbo\Tables\UserProjectRoles.sql" />
     <Build Include="dbo\Tables\Stories.sql" />
@@ -90,5 +75,8 @@
     <Build Include="dbo\Tables\Features.sql" />
     <Build Include="dbo\Tables\AuditLogs.sql" />
     <Build Include="dbo\Tables\Epics.sql" />
+    <Build Include="dbo\Stored Procedures\sp_fb_UpsertUser.sql" />
+    <Build Include="dbo\Stored Procedures\sp_fb_GetUserById.sql" />
+    <Build Include="dbo\Stored Procedures\sp_fb_GetAllUsers.sql" />
   </ItemGroup>
 </Project>
