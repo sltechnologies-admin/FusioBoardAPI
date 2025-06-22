@@ -10,7 +10,7 @@
         public string Action { get; set; }
         public string Entity { get; set; }
         public string Details { get; set; }
-        public DateTime Timestamp { get; set; }
+        public DateTime? Timestamp { get; set; }
 
         public User User { get; set; }
     }

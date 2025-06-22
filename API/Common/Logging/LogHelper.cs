@@ -1,6 +1,12 @@
 ﻿
 namespace API.Common.Logging
 {
+    #region Best practices 
+    /*
+       - Can we log the input payload - TODO
+       - Middleware adds UserId to every log through structured logging scope 
+    */
+    #endregion
     public static class LogHelper
     {
         public static async Task LogErrorAsync(
@@ -9,7 +15,7 @@ namespace API.Common.Logging
             string eventCode,
             string correlationId,
             string message,
-            Exception ex)
+            string ex)
         {
             // 1. Log to built-in ILogger
             //    logger.LogError(ex, "[{EventCode}] CorrelationId: {CorrelationId} - {Message}", eventCode, correlationId, message);
@@ -20,7 +26,7 @@ namespace API.Common.Logging
                 EventCode = eventCode,
                 CorrelationId = correlationId,
                 Message = message,
-                Exception = ex.ToString()
+                Exception = ex
             });
         }
 

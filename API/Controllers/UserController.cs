@@ -4,6 +4,7 @@ using API.Controllers;
 using API.DAL.DTO;
 using API.Data.Interfaces;
 using API.Models.Requests;
+using API.Services;
 using API.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Data.SqlClient;
@@ -12,7 +13,7 @@ public class UserController : BaseController
 {
     private readonly IDatabaseService _db;
 
-    private readonly IUserService _authService;
+    private readonly IUserService _userService;
     private readonly IAppLogger<UserController> _logger;
     private readonly ISqlLogger _sqlLogger;
 
@@ -24,11 +25,11 @@ public class UserController : BaseController
         _logger = logger;
 
         //specific 
-        _authService = authService;
+        _userService = authService;
     }
 
     /// <summary>
-    /// Sign Up
+    /// Sign Up: Create new user and update user details
     /// </summary>
     /// <param name="request">RegisterRequest</param>
     /// <returns>JWT token on success, error message on failure.</returns>
@@ -41,7 +42,7 @@ public class UserController : BaseController
 
         try
         {
-            var result = await _authService.RegisterUserAsync(request);
+            var result = await _userService.UpsertUserAsync(request);
             if (!result.Success)
                 return BadRequest(new { message = result.ErrorMessage });
 
@@ -51,8 +52,50 @@ public class UserController : BaseController
         catch (Exception ex)
         {
             var eventCode = "REG-ERR-01";
-            await LogHelper.LogErrorAsync(_sqlLogger, eventCode,CorrelationId,Messages.User.e_UnexpectedRegistrationError,ex);
+            await LogHelper.LogErrorAsync(_sqlLogger, eventCode,CorrelationId,Messages.User.e_UnexpectedRegistrationError,ex.Message);
             return StatusCode(HttpStatusCodes.InternalServerError, new { message = "An unexpected error occurred.", correlationId = CorrelationId });
+        }
+    }
+
+    /// <summary>
+    /// Get User Details by id 
+    /// </summary>
+
+    [HttpGet("{id}")]
+    public async Task<IActionResult> GetById(int id)
+    {
+        var user = await _userService.GetUserByIdAsync(id);
+        return user != null ? Ok(user) : NotFound();
+    }
+
+    /// <summary>
+    /// Get All User Details 
+    /// </summary>
+    [HttpGet]
+    public async Task<IActionResult> GetAll()
+    {
+        try
+        {
+            var users = await _userService.GetAllUsersAsync();
+            //_logger.LogInformation( "[GETALL-SUCCESS-01] CorrelationId: {CorrelationId} - Retrieved {UserCount} users",
+            //    CorrelationId,
+            //    users.Count);
+
+            return Ok(users);
+        }
+        catch (Exception ex)
+        {
+            const string eventCode = "GETALL-ERR-01";
+            await LogHelper.LogErrorAsync(
+                _sqlLogger,
+                eventCode,
+                CorrelationId,
+                "An unexpected error occurred while fetching all users.",
+                ex.Message);
+
+            return StatusCode(
+                HttpStatusCodes.InternalServerError,
+                new { message = "An unexpected error occurred.", correlationId = CorrelationId });
         }
     }
 

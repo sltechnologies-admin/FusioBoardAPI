@@ -1,13 +1,19 @@
-﻿namespace API.Models.Requests
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace API.Models.Requests
 {
     public class RegisterRequest
     {
-        public required string Username { get; set; }
-        public required string Email { get; set; }
-        public required string Password { get; set; }
+        [Required]
+        public int? UserId { get; set; }  // Required for update scenarios
 
-        //public string FirstName { get; set; }
-        //public string MiddleName { get; set; }  // optional
-        //public string LastName { get; set; }
+        public required string Username { get; set; }
+
+        [EmailAddress]
+        public required string Email { get; set; }
+
+        [StringLength(100, MinimumLength = 6)]
+        public required string Password { get; set; }
     }
+
 }

@@ -3,6 +3,10 @@ using API.Data.Interfaces;
 using API.Models.Requests;
 using API.Repositories.Interfaces;
 using System.Data;
+using API.Features.Users.Entities;
+using API.Common.Extensions;
+using Microsoft.AspNetCore.Http.HttpResults;
+using Microsoft.AspNetCore.Identity;
 
 namespace API.Repositories
 {
@@ -17,10 +21,9 @@ namespace API.Repositories
 
         public async Task<bool> UserExistsAsync(string email, string username)
         {
-            var query = "SELECT COUNT(1) FROM Users WHERE Email = @Email OR Username = @Username";
+            var query = "SELECT COUNT(1) FROM Users WHERE Username = @Username";
             var parameters = new List<SqlParameter>
         {
-             new SqlParameter("@Email", SqlDbType.NVarChar) { Value = email },
              new SqlParameter("@Username", SqlDbType.NVarChar) { Value = username }
         };
 
@@ -30,25 +33,80 @@ namespace API.Repositories
             return count > 0;
         }
 
-        public async Task InsertUserAsync(RegisterRequest request)
+        public async Task UpsertUserAsync(RegisterRequest request)
         {
-            var query = @"
-            INSERT INTO Users (Username, Email, PasswordHash,CreatedAt, UpdatedAt, IsActive)
-            VALUES (@Username, @Email, @PasswordHash, @CreatedAt, @UpdatedAt, @IsActive)";
-
-            var now = DateTime.UtcNow;
             var parameters = new List<SqlParameter>
             {
-            new SqlParameter("@Username", request.Username),
-            new SqlParameter("@Email", request.Email),
-            new SqlParameter("@PasswordHash", request.Password),
-            new SqlParameter("@CreatedAt", now),
-            new SqlParameter("@UpdatedAt", now),
-            new SqlParameter("@IsActive", true)
-        };
+                 new SqlParameter("@Username", request.Username),
+                 new SqlParameter("@Email", request.Email),
+                 new SqlParameter("@PasswordHash", request.Password)
+            };
 
-            await _db.ExecuteNonQueryAsync(query, parameters);
+            await _db.ExecuteNonQueryAsync(
+                "sp_fb_UpsertUser",  // this is passed as 'query'
+                parameters,
+                CommandType.StoredProcedure
+            );
+        }
+
+        public async Task<UserEntity?> GetByIdAsync(int userId = 0)
+        {
+            //var parameters = new List<SqlParameter>
+            //{
+            // new SqlParameter("@UserId", userId)
+            //};
+            var parameters = new List<SqlParameter>
+            {
+            new SqlParameter("@UserId", SqlDbType.Int) { Value = userId }
+            };
+
+
+            var res = await _db.ExecuteReaderAsync(
+             "sp_fb_GetUserById",
+             parameters,
+             reader =>   new UserEntity{
+                UserId = reader.GetInt32("UserId"),
+                Username = reader.GetString("Username"),
+                Email = reader.GetString("Email"),
+                PasswordHash = reader.GetString("PasswordHash"),
+                IsActive = reader.GetBoolean("IsActive"),
+               CreatedAt = reader.GetDateTimeOffset("CreatedAt").UtcDateTime,
+               UpdatedAt = reader.GetDateTimeOffset("UpdatedAt").UtcDateTime
+            },
+            CommandType.StoredProcedure
+            );
+
+               return res.FirstOrDefault();
+        }
+
+
+        public async Task<IReadOnlyList<UserEntity>> GetAllAsync()
+        {
+            try
+            {
+                var res = await _db.ExecuteReaderAsync(
+               "sp_fb_GetAllUsers",
+               new List<SqlParameter>(),
+               reader => new UserEntity {
+                  UserId = reader.GetInt32("UserId"),
+                  Username = reader.GetString("Username"),
+                  Email = reader.GetString("Email"),
+                  PasswordHash = reader.GetString("PasswordHash"),
+                  IsActive = reader.GetBoolean("IsActive"),
+                  CreatedAt = reader.GetDateTimeOffset("CreatedAt").UtcDateTime,
+                  UpdatedAt = reader.GetDateTimeOffset("UpdatedAt").UtcDateTime
+               },
+              CommandType.StoredProcedure
+              );
+
+                return res.ToList();
+            }
+            catch (Exception ex)
+            {
+                string error = ex.Message;
+                throw;
+            }
         }
     }
-
-}
+ }
+ 
