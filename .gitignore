@@ -180,3 +180,4 @@
 /API/obj/Debug/net8.0/staticwebassets.removed.txt
 /API/obj/API.csproj.nuget.g.props
 /.gitignore
+/API/obj/Debug/net8.0/EndpointInfo
