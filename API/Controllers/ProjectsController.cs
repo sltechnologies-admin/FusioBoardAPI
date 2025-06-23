@@ -1,6 +1,9 @@
-﻿using API.Constants;
+﻿using API.Common.Logging;
+using API.Constants;
 using API.DAL.DTO;
 using API.Data;
+using API.Data.Interfaces;
+using API.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Data.SqlClient;
 
@@ -12,11 +15,21 @@ namespace API.Controllers
 {
     public class ProjectsController : BaseController
     {
-        private readonly SqlDatabaseService _db;
+        private readonly IDatabaseService _db;
 
-        public ProjectsController(SqlDatabaseService db)
+        private readonly IProjectService _service;
+        private readonly IAppLogger<UserController> _logger;
+        private readonly ISqlLogger _sqlLogger;
+
+        public ProjectsController(IDatabaseService db, ISqlLogger sqlLogger, IAppLogger<UserController> logger, IProjectService service)
         {
+            //coomon 
             _db = db;
+            _sqlLogger = sqlLogger;
+            _logger = logger;
+
+            //specific 
+            _service = service;
         }
 
 
@@ -192,71 +205,15 @@ namespace API.Controllers
                 return StatusCode(HttpStatusCodes.InternalServerError, new { error = "Unexpected error", detail = ex.Message });
             }
         }
-        /*
-                #region release 
-                [HttpPost("api/projects/{projectId}/releases")]
-                public async Task<IActionResult> CreateRelease(int projectId, [FromBody] CreateReleaseRequest request)
-                {
-                    // Step 1: Check for existing release name in the project
-                    string checkQuery = @"
-                SELECT COUNT(*) FROM Releases 
-                WHERE ProjectId = @ProjectId AND ReleaseName = @ReleaseName";
 
-                    var checkParams = new List<SqlParameter>
-                    {
-                new SqlParameter("@ProjectId", projectId),
-                new SqlParameter("@ReleaseName", request.ReleaseName)
-            };
-
-                    try
-                    {
-                        var count = (int)await _db.ExecuteScalarAsync(checkQuery, checkParams);
-
-
-                        if (count > 0)
-                        {
-                            return Conflict(new {
-                                message = "A release with the same name already exists in this project."
-                            });
-                        }
-
-                        // Step 2: Generate new ReleaseId (auto-increment if DB doesn't handle it)
-                        string idQuery = "SELECT ISNULL(MAX(ReleaseId), 0) + 1 FROM Releases";
-                        int newReleaseId = await _db.ExecuteScalarAsync<int>(idQuery);
-
-                        // Step 3: Insert release
-                        string insertQuery = @"
-                    INSERT INTO Releases (ReleaseId, ProjectId, ReleaseName, ReleaseDate, Description, CreatedAt)
-                    VALUES (@ReleaseId, @ProjectId, @ReleaseName, @ReleaseDate, @Description, SYSDATETIMEOFFSET())";
-
-                        var insertParams = new List<SqlParameter>
-                        {
-                    new SqlParameter("@ReleaseId", newReleaseId),
-                    new SqlParameter("@ProjectId", projectId),
-                    new SqlParameter("@ReleaseName", request.ReleaseName),
-                    new SqlParameter("@ReleaseDate", request.ReleaseDate ?? (object)DBNull.Value),
-                    new SqlParameter("@Description", string.IsNullOrEmpty(request.Description) ? DBNull.Value : request.Description)
-                };
-
-                        int result = await _db.ExecuteNonQueryAsync(insertQuery, insertParams);
-
-                        if (result == 0)
-                        {
-                            return StatusCode(HttpStatusCodes.InternalServerError, new { message = "Failed to create release." });
-                        }
-
-                        return Ok(new {
-                            message = "Release created successfully.",
-                            releaseId = newReleaseId
-                        });
-                    }
-                    catch (Exception ex)
-                    {
-                        return StatusCode(HttpStatusCodes.InternalServerError, new { message = "An error occurred.", error = ex.Message });
-                    }
-                }
-
-                #endregion 
-        */
+        /// <summary>
+        /// Get Details by id 
+        /// </summary>
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetById(int id)
+        {
+            var user = await _service.GetProjectByIdAsync(id);
+            return user != null ? Ok(user) : NotFound();
+        }
     }
 }

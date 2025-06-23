@@ -13,11 +13,11 @@ public class UserController : BaseController
 {
     private readonly IDatabaseService _db;
 
-    private readonly IUserService _userService;
+    private readonly IUserService _service;
     private readonly IAppLogger<UserController> _logger;
     private readonly ISqlLogger _sqlLogger;
 
-    public UserController( IDatabaseService db, ISqlLogger sqlLogger, IAppLogger<UserController> logger, IUserService authService)
+    public UserController( IDatabaseService db, ISqlLogger sqlLogger, IAppLogger<UserController> logger, IUserService service)
     {
         //coomon 
         _db = db;
@@ -25,7 +25,7 @@ public class UserController : BaseController
         _logger = logger;
 
         //specific 
-        _userService = authService;
+        _service = service;
     }
 
     /// <summary>
@@ -42,7 +42,7 @@ public class UserController : BaseController
 
         try
         {
-            var result = await _userService.UpsertUserAsync(request);
+            var result = await _service.UpsertUserAsync(request);
             if (!result.Success)
                 return BadRequest(new { message = result.ErrorMessage });
 
@@ -64,7 +64,7 @@ public class UserController : BaseController
     [HttpGet("{id}")]
     public async Task<IActionResult> GetById(int id)
     {
-        var user = await _userService.GetUserByIdAsync(id);
+        var user = await _service.GetUserByIdAsync(id);
         return user != null ? Ok(user) : NotFound();
     }
 
@@ -76,7 +76,7 @@ public class UserController : BaseController
     {
         try
         {
-            var users = await _userService.GetAllUsersAsync();
+            var users = await _service.GetAllUsersAsync();
             //_logger.LogInformation( "[GETALL-SUCCESS-01] CorrelationId: {CorrelationId} - Retrieved {UserCount} users",
             //    CorrelationId,
             //    users.Count);

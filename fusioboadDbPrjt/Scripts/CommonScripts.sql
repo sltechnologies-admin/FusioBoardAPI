@@ -1,0 +1,9 @@
+﻿CREATE TABLE Logs (
+    LogId INT IDENTITY PRIMARY KEY,
+    LogLevel VARCHAR(20),
+    EventCode VARCHAR(50),
+    CorrelationId VARCHAR(100),
+    Message NVARCHAR(MAX),
+    Exception NVARCHAR(MAX),
+    CreatedAt DATETIMEOFFSET DEFAULT SYSDATETIMEOFFSET()
+);

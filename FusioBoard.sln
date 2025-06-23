@@ -9,8 +9,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Database", "Database", "{B7
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "API", "API\API.csproj", "{4D12B991-7E98-4231-9056-60B0054A0F6A}"
 EndProject
-Project("{00D1A9C2-B5F0-4AF3-8072-F6C62B433612}") = "fusioboard-db", "fusioboard-db\fusioboard-db.sqlproj", "{6FA8D823-E840-470C-928D-D68A240CD07B}"
-EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Files", "Files", "{66F7AC8F-374C-42A0-92D3-7BAD82AB26F1}"
 	ProjectSection(SolutionItems) = preProject
 		FilesAndContent\Project_API_Endpoints.xlsx = FilesAndContent\Project_API_Endpoints.xlsx
@@ -29,12 +27,6 @@ Global
 		{4D12B991-7E98-4231-9056-60B0054A0F6A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{4D12B991-7E98-4231-9056-60B0054A0F6A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{4D12B991-7E98-4231-9056-60B0054A0F6A}.Release|Any CPU.Build.0 = Release|Any CPU
-		{6FA8D823-E840-470C-928D-D68A240CD07B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{6FA8D823-E840-470C-928D-D68A240CD07B}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{6FA8D823-E840-470C-928D-D68A240CD07B}.Debug|Any CPU.Deploy.0 = Debug|Any CPU
-		{6FA8D823-E840-470C-928D-D68A240CD07B}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{6FA8D823-E840-470C-928D-D68A240CD07B}.Release|Any CPU.Build.0 = Release|Any CPU
-		{6FA8D823-E840-470C-928D-D68A240CD07B}.Release|Any CPU.Deploy.0 = Release|Any CPU
 		{46D637D3-5E32-41FD-B516-56B6AAF018FA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{46D637D3-5E32-41FD-B516-56B6AAF018FA}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{46D637D3-5E32-41FD-B516-56B6AAF018FA}.Debug|Any CPU.Deploy.0 = Debug|Any CPU
@@ -47,7 +39,6 @@ Global
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{4D12B991-7E98-4231-9056-60B0054A0F6A} = {C9705A52-7B66-4509-AB12-099DC1EBE854}
-		{6FA8D823-E840-470C-928D-D68A240CD07B} = {B7942959-0D7C-494A-9006-88B353A08F9C}
 		{46D637D3-5E32-41FD-B516-56B6AAF018FA} = {B7942959-0D7C-494A-9006-88B353A08F9C}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution

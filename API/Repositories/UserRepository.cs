@@ -49,15 +49,11 @@ namespace API.Repositories
             );
         }
 
-        public async Task<UserEntity?> GetByIdAsync(int userId = 0)
+        public async Task<UserEntity?> GetByIdAsync(int id = 0)
         {
-            //var parameters = new List<SqlParameter>
-            //{
-            // new SqlParameter("@UserId", userId)
-            //};
             var parameters = new List<SqlParameter>
             {
-            new SqlParameter("@UserId", SqlDbType.Int) { Value = userId }
+            new SqlParameter("@id", SqlDbType.Int) { Value = id }
             };
 
 
@@ -76,7 +72,7 @@ namespace API.Repositories
             CommandType.StoredProcedure
             );
 
-               return res.FirstOrDefault();
+            return res.FirstOrDefault();
         }
 
 

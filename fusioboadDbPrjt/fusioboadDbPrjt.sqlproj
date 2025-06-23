@@ -78,5 +78,7 @@
     <Build Include="dbo\Stored Procedures\sp_fb_UpsertUser.sql" />
     <Build Include="dbo\Stored Procedures\sp_fb_GetUserById.sql" />
     <Build Include="dbo\Stored Procedures\sp_fb_GetAllUsers.sql" />
+    <Build Include="dbo\Stored Procedures\sp_fb_GetProjectById.sql" />
+    <Build Include="dbo\Stored Procedures\sp_fb_Validate_UserLogin.sql" />
   </ItemGroup>
 </Project>

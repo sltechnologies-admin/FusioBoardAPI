@@ -9,16 +9,16 @@ namespace API.Services
 {
     public class UserService : IUserService
     {
-        private readonly IUserRepository _userRepo;
+        private readonly IUserRepository _repo;
 
         public UserService(IUserRepository AuthRepository)
         {
-            _userRepo = AuthRepository;
+            _repo = AuthRepository;
         }
 
         public async Task<UserDto?> GetUserByIdAsync(int userId)
         {
-            var entity = await _userRepo.GetByIdAsync(userId);
+            var entity = await _repo.GetByIdAsync(userId);
             if (entity == null) return null;
             return new UserDto {
                 UserId = entity.UserId,
@@ -30,7 +30,7 @@ namespace API.Services
 
         public async Task<IReadOnlyList<UserDto>> GetAllUsersAsync()
         {
-            var entities = await _userRepo.GetAllAsync();
+            var entities = await _repo.GetAllAsync();
             return entities
                 .Select(e => new UserDto {
                     UserId = e.UserId,
@@ -45,11 +45,11 @@ namespace API.Services
 
         public async Task<(bool Success, string ErrorMessage)> UpsertUserAsync(RegisterRequest request)
         {
-            var exists = await _userRepo.UserExistsAsync(request.Email, request.Username);
+            var exists = await _repo.UserExistsAsync(request.Email, request.Username);
             if (exists)
                 return (false, Messages.User.i_UserAlreadyExists);
 
-            await _userRepo.UpsertUserAsync(request);
+            await _repo.UpsertUserAsync(request);
             return (true, null);
         }
 
