@@ -1,8 +1,9 @@
-﻿CREATE PROCEDURE [dbo].[sp_fb_GetProjectById]
-    @id INT = 0
+﻿ CREATE PROCEDURE [dbo].[sp_fb_GetAllProjects]
 AS
 BEGIN
-    SELECT
+    SET NOCOUNT ON;
+
+    SELECT 
         ProjectId,
         ProjectName,
         Description,
@@ -13,5 +14,5 @@ BEGIN
         UpdatedAt,
         IsActive
     FROM Projects
-    WHERE ProjectId = @id;
-END
+    ORDER BY CreatedAt DESC;
+END;

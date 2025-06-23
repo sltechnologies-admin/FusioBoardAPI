@@ -80,5 +80,10 @@
     <Build Include="dbo\Stored Procedures\sp_fb_GetAllUsers.sql" />
     <Build Include="dbo\Stored Procedures\sp_fb_GetProjectById.sql" />
     <Build Include="dbo\Stored Procedures\sp_fb_Validate_UserLogin.sql" />
+    <Build Include="dbo\Tables\UserRoles.sql" />
+    <Build Include="dbo\Stored Procedures\sp_fb_GetUserRoles.sql" />
+    <Build Include="dbo\Stored Procedures\sp_fb_GetUserPermissions.sql" />
+    <Build Include="dbo\Stored Procedures\sp_fb_GetAllProjects.sql" />
+    <Build Include="dbo\Stored Procedures\sp_fb_AssignUserRole.sql" />
   </ItemGroup>
 </Project>

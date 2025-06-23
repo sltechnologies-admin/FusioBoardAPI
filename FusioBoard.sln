@@ -13,6 +13,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Files", "Files", "{66F7AC8F
 	ProjectSection(SolutionItems) = preProject
 		FilesAndContent\Project_API_Endpoints.xlsx = FilesAndContent\Project_API_Endpoints.xlsx
 		Readme.txt = Readme.txt
+		table_defitions_jun23_2025.sql = table_defitions_jun23_2025.sql
 	EndProjectSection
 EndProject
 Project("{00D1A9C2-B5F0-4AF3-8072-F6C62B433612}") = "fusioboadDbPrjt", "fusioboadDbPrjt\fusioboadDbPrjt.sqlproj", "{46D637D3-5E32-41FD-B516-56B6AAF018FA}"

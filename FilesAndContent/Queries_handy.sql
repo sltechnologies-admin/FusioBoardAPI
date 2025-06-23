@@ -1,5 +1,3 @@
-
-
 -- Tables: 
 select   * from Users
 select   * from Projects
