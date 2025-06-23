@@ -4,7 +4,6 @@ using API.Controllers;
 using API.DAL.DTO;
 using API.Data.Interfaces;
 using API.Models.Requests;
-using API.Services;
 using API.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Data.SqlClient;
@@ -29,7 +28,7 @@ public class UserController : BaseController
     }
 
     /// <summary>
-    /// Sign Up: Create new user and update user details
+    /// Create or update user
     /// </summary>
     /// <param name="request">RegisterRequest</param>
     /// <returns>JWT token on success, error message on failure.</returns>
@@ -58,7 +57,7 @@ public class UserController : BaseController
     }
 
     /// <summary>
-    /// Get User Details by id 
+    /// Get user by ID
     /// </summary>
 
     [HttpGet("{id}")]
@@ -69,7 +68,7 @@ public class UserController : BaseController
     }
 
     /// <summary>
-    /// Get All User Details 
+    /// Get all users
     /// </summary>
     [HttpGet]
     public async Task<IActionResult> GetAll()
@@ -100,7 +99,7 @@ public class UserController : BaseController
     }
 
     /// <summary>
-    /// Log in
+    /// User login
     /// </summary>
     /// <param name="request">LoginRequest</param>
     /// <returns></returns>
@@ -136,6 +135,11 @@ public class UserController : BaseController
         });
     }
 
+    /// <summary>
+    /// 	Change user password
+    /// </summary>
+    /// <param name="request"></param>
+    /// <returns></returns>
     [HttpPost("change-password")]
     public async Task<IActionResult> ChangePassword([FromBody] ChangePasswordRequest request)
     {

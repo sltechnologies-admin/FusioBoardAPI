@@ -34,7 +34,7 @@ namespace API.Controllers
 
 
         /// <summary>
-        /// Create a new project
+        /// Create project
         /// </summary>
         /// <param name="request"></param>
         /// <returns></returns>
@@ -90,7 +90,7 @@ namespace API.Controllers
 
 
         /// <summary>
-        /// Assign/Edit  role to a user in a project
+        /// Assign/edit role for user in project
         /// </summary>
         /// <param name="projectId"></param>
         /// <param name="request"></param>
@@ -106,7 +106,7 @@ namespace API.Controllers
                 // Check if the role is already assigned
                 string checkQuery = @"
             SELECT COUNT(*) 
-            FROM UserProjectRoles 
+            FROM UserRoles 
             WHERE ProjectId = @ProjectId AND UserId = @UserId AND RoleId = @RoleId";
 
                 int checkCount = (int)await _db.ExecuteScalarAsync(checkQuery, new List<SqlParameter>
@@ -120,7 +120,7 @@ namespace API.Controllers
                 {
                     // If role already assigned, update AssignedAt timestamp
                     string updateQuery = @"
-                UPDATE UserProjectRoles
+                UPDATE UserRoles
                 SET RoleId = @RoleId, AssignedAt = @AssignedAt
                 WHERE ProjectId = @ProjectId AND UserId = @UserId";
 
@@ -137,7 +137,7 @@ namespace API.Controllers
 
                 // Insert new role assignment
                 string insertQuery = @"
-            INSERT INTO UserProjectRoles (UserId, ProjectId, RoleId, AssignedAt)
+            INSERT INTO UserRoles (UserId, ProjectId, RoleId, AssignedAt)
             VALUES (@UserId, @ProjectId, @RoleId, @AssignedAt)";
 
                 await _db.ExecuteNonQueryAsync(insertQuery, new List<SqlParameter>
@@ -162,7 +162,7 @@ namespace API.Controllers
         }
 
         /// <summary>
-        /// View project summary/details
+        /// View roles in project (project-user-role view)
         /// </summary>
         /// <param name="projectId"></param>
         /// <returns></returns>
@@ -174,7 +174,7 @@ namespace API.Controllers
             {
                 string query = @"
             SELECT upr.UserId, u.UserName, upr.RoleId, r.RoleName, upr.AssignedAt
-            FROM UserProjectRoles upr
+            FROM UserRoles upr
             INNER JOIN Users u ON upr.UserId = u.UserId
             INNER JOIN Roles r ON upr.RoleId = r.RoleId
             WHERE upr.ProjectId = @ProjectId
@@ -207,7 +207,7 @@ namespace API.Controllers
         }
 
         /// <summary>
-        /// Get Details by id 
+        /// Get project by ID
         /// </summary>
         [HttpGet("{id}")]
         public async Task<IActionResult> GetById(int id)

@@ -68,14 +68,14 @@ namespace API.Repositories
 
                     // Map only when reader has rows
                     return new ProjectEntity {
-                        ProjectId = reader.GetInt32("Id"),
+                        ProjectId = reader.GetInt32("ProjectId"),
                         Name = reader.GetString("ProjectName"),
                         Description = reader.GetString("Description"),
-                        StartDate = DateOnly.FromDateTime(reader.GetDateTime("StartDate")),
-                        EndDate = DateOnly.FromDateTime(reader.GetDateTime("EndDate")),
-                        CreatedBy = reader.GetString("CreatedBy"),
-                        CreatedAt = reader.GetDateTimeOffset("CreatedAt").UtcDateTime,
-                        UpdatedAt = reader.GetDateTimeOffset("UpdatedAt").UtcDateTime,
+                        //StartDate = DateOnly.FromDateTime(reader.GetDateTime("StartDate")),
+                        //EndDate = DateOnly.FromDateTime(reader.GetDateTime("EndDate")),
+                        //CreatedBy = reader.GetString("CreatedBy"),
+                        //CreatedAt = reader.GetDateTimeOffset("CreatedAt").UtcDateTime,
+                        //UpdatedAt = reader.GetDateTimeOffset("UpdatedAt").UtcDateTime,
                         IsActive = reader.GetBoolean("IsActive")
                     };
                 },
