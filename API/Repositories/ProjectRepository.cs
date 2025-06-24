@@ -1,7 +1,7 @@
 ﻿using API.Common.Extensions;
+using API.Common.Models;
 using API.Data.Interfaces;
 using API.Features.Projects.Entities;
-using API.Features.Users.Entities;
 using API.Repositories.Interfaces;
 using Microsoft.Data.SqlClient;
 using System.Data;
@@ -17,49 +17,15 @@ namespace API.Repositories
             _db = db;
         }
 
-        //public async Task<ProjectEntity?> GetByIdAsync(int id)
-        //{
-        //    try
-        //    {
-        //        var parameters = new List<SqlParameter>
-        //        {
-        //    new SqlParameter("@id", SqlDbType.Int) { Value = id }
-        //};
-
-        //        var res = await _db.ExecuteReaderAsync(
-        //            "sp_fb_GetProjectById",
-        //            parameters,
-        //            reader => new ProjectEntity {
-        //                ProjectId = reader.GetInt32(reader.GetOrdinal("Id")),
-        //                Name = reader.GetSafeString("ProjectName"),
-        //                Description = reader.GetSafeString("Description"),
-        //                StartDate = reader.GetSafeDateOnly("StartDate") ?? default,
-        //                EndDate = reader.GetSafeDateOnly("EndDate") ?? default,
-        //                CreatedBy = reader.GetSafeString("CreatedBy"),
-        //                CreatedAt = reader.GetSafeDateTimeOffset("CreatedAt")?.UtcDateTime ?? default,
-        //                UpdatedAt = reader.GetSafeDateTimeOffset("UpdatedAt")?.UtcDateTime ?? default,
-        //                IsActive = reader.GetBoolean(reader.GetOrdinal("IsActive")),
-        //            },
-        //            CommandType.StoredProcedure
-        //        );
-
-        //        return res.FirstOrDefault();
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        throw;
-        //    }
-        //}
-
-        public async Task<ProjectEntity?> GetByIdAsync(int projectId)
+        public async Task<ProjectEntity?> GetByIdAsync(int id)
         {
             var parameters = new List<SqlParameter>
             {
-        new SqlParameter("@id", SqlDbType.Int) { Value = projectId }
-    };
+                new SqlParameter("@id", SqlDbType.Int) { Value = id }
+             };
 
             var results = await _db.ExecuteReaderAsync(
-                "sp_fb_GetProjectById",
+                "sp_fb_Project_GetById",
                 parameters,
                 reader =>
                 {
@@ -71,12 +37,12 @@ namespace API.Repositories
                         ProjectId = reader.GetInt32("ProjectId"),
                         Name = reader.GetString("ProjectName"),
                         Description = reader.GetString("Description"),
-                        //StartDate = DateOnly.FromDateTime(reader.GetDateTime("StartDate")),
-                        //EndDate = DateOnly.FromDateTime(reader.GetDateTime("EndDate")),
-                        //CreatedBy = reader.GetString("CreatedBy"),
-                        //CreatedAt = reader.GetDateTimeOffset("CreatedAt").UtcDateTime,
-                        //UpdatedAt = reader.GetDateTimeOffset("UpdatedAt").UtcDateTime,
-                        IsActive = reader.GetBoolean("IsActive")
+                        //StartDate = reader.IsDBNull("StartDate") ? null : DateOnly.FromDateTime(reader.GetDateTime("StartDate")),
+                        //EndDate = reader.IsDBNull("EndDate") ? null : DateOnly.FromDateTime(reader.GetDateTime("EndDate")),
+                        CreatedBy = reader.IsDBNull("CreatedBy") ? null : reader.GetInt32("CreatedBy").ToString(),
+                        IsActive = reader.IsDBNull("IsActive") ? null : reader.GetBoolean("IsActive"),
+                        CreatedAt = reader.IsDBNull("CreatedAt") ? null : reader.GetDateTimeOffset("CreatedAt").UtcDateTime,
+                        UpdatedAt = reader.IsDBNull("UpdatedAt") ? null : reader.GetDateTimeOffset("UpdatedAt").UtcDateTime
                     };
                 },
                 CommandType.StoredProcedure
@@ -85,38 +51,102 @@ namespace API.Repositories
             // Return first match or null
             return results.FirstOrDefault();
         }
-        public async Task<ProjectEntity?> GetByIdAsyncOld(int id)
-        {
-            try
-            {
-            var parameters = new List<SqlParameter>
-            {
-            new SqlParameter("@id", SqlDbType.Int) { Value = id }
-            };
 
-            var res = await _db.ExecuteReaderAsync(
-             "sp_fb_GetProjectById",
-             parameters,
-             reader => new ProjectEntity {
-                 ProjectId = reader.GetInt32("Id"),
-                 Name = reader.GetString("ProjectName"),
-                 Description = reader.GetSafeString("Description"),
-                 StartDate = DateOnly.FromDateTime(reader.GetDateTime(reader.GetOrdinal("StartDate"))),
-                 EndDate = DateOnly.FromDateTime(reader.GetDateTime(reader.GetOrdinal("EndDate"))),
-                 CreatedBy = reader.GetSafeString("CreatedBy"),
-                 CreatedAt = reader.GetDateTimeOffset("CreatedAt").UtcDateTime,
-                 UpdatedAt = reader.GetDateTimeOffset("UpdatedAt").UtcDateTime,
-                 IsActive = reader.GetBoolean("IsActive"),
-             },
-            CommandType.StoredProcedure
+        public async Task<List<ProjectEntity>> GetAllAsync()
+        {
+            var result = await _db.ExecuteReaderAsync(
+                "sp_fb_Project_GetAll",
+                new List<SqlParameter>(),
+                reader => new ProjectEntity {
+                    ProjectId = reader.GetInt32("ProjectId"),
+                    Name = reader.GetString("ProjectName"),
+                    Description = reader.IsDBNull("Description") ? null : reader.GetString("Description"),
+                    //StartDate = reader.IsDBNull("StartDate") ? null : DateOnly.FromDateTime(reader.GetDateTime("StartDate")),
+                    //EndDate = reader.IsDBNull("EndDate") ? null : DateOnly.FromDateTime(reader.GetDateTime("EndDate")),
+                    CreatedBy = reader.IsDBNull("CreatedBy") ? null : reader.GetInt32("CreatedBy").ToString(),
+                    IsActive = reader.IsDBNull("IsActive") ? null : reader.GetBoolean("IsActive"),
+                    CreatedAt = reader.IsDBNull("CreatedAt") ? null : reader.GetDateTimeOffset("CreatedAt").UtcDateTime,
+                    UpdatedAt = reader.IsDBNull("UpdatedAt") ? null : reader.GetDateTimeOffset("UpdatedAt").UtcDateTime
+
+                },
+                CommandType.StoredProcedure
             );
 
-            return res.FirstOrDefault();
+            return result;
+        }
+
+        public async Task<Result<bool>> UpdateAsync(ProjectEntity entity)
+        {
+            const string storedProc = "sp_fb_Project_Update";
+
+            var parameters = new List<SqlParameter>
+            {
+                 new("@ProjectId", entity.ProjectId),
+                 new("@ProjectName", entity.Name),
+                 new("@Description", (object?)entity.Description ?? DBNull.Value),
+                 new("@StartDate", entity.StartDate ?? (object)DBNull.Value),
+                 new("@EndDate", entity.EndDate ?? (object)DBNull.Value),
+                 new("@IsActive", entity.IsActive ?? true)
+            };
+
+            try
+            {
+                int rowsAffected = await _db.ExecuteNonQueryAsync(storedProc, parameters, CommandType.StoredProcedure);
+
+                if (rowsAffected == 0)
+                    return Result<bool>.Fail("Project not found.");
+
+                return Result<bool>.SuccessResult(true);
+            }
+            catch (SqlException ex) when (ex.Number == 50000 && ex.State == 2) // Duplicate project name
+            {
+                return Result<bool>.Fail("Project name already exists.");
+            }
+            catch (SqlException ex) when (ex.Number == 50000 && ex.State == 1) // Not found
+            {
+                return Result<bool>.Fail("Project not found.");
             }
             catch (Exception ex)
             {
-                throw;
+                return Result<bool>.Fail("An error occurred while updating the project.", ex.ToString());
             }
         }
+
+
+        //    public async Task<Result<bool>> UpdateAsync(ProjectEntity entity)
+        //    {
+        //        const string query = @"
+        //    UPDATE Projects
+        //    SET 
+        //        ProjectName = @ProjectName,
+        //        Description = @Description,
+        //        StartDate = @StartDate,
+        //        EndDate = @EndDate,
+        //        IsActive = @IsActive
+        //    WHERE ProjectId = @ProjectId";
+
+        //        var parameters = new List<SqlParameter>
+        //        {
+        //    new("@ProjectId", entity.ProjectId),
+        //    new("@ProjectName", entity.Name),
+        //    new("@Description", (object?)entity.Description ?? DBNull.Value),
+        //    new SqlParameter("@StartDate", entity.StartDate ?? (object)DBNull.Value),
+        //    new SqlParameter("@EndDate", entity.EndDate ??(object) DBNull.Value),
+        //    new("@IsActive", entity.IsActive ?? true)
+        //};
+
+        //        try
+        //        {
+        //            int rowsAffected = await _db.ExecuteNonQueryAsync(query, parameters);
+        //            if (rowsAffected == 0)
+        //                return Result<bool>.Fail("Project not found.");
+
+        //            return Result<bool>.SuccessResult(true);
+        //        }
+        //        catch (Exception ex)
+        //        {
+        //            return Result<bool>.Fail("An error occurred while updating the project.", ex.ToString());
+        //        }
+        //    }
     }
 }

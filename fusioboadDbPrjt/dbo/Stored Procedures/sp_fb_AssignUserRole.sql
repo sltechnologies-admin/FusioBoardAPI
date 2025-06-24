@@ -1,4 +1,4 @@
-﻿CREATE PROCEDURE [dbo].[sp_fb_AssignUserRole]
+﻿CREATE PROCEDURE [dbo].[sp_fb_UserRole_Assign]
     @UserId INT,
     @ProjectId INT,
     @RoleId INT

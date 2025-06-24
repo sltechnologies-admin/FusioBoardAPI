@@ -2,28 +2,33 @@
 {
     public class ProjectEntity
     {
-        public int ProjectId { get;  set; }
-        public string Name { get;  set; } = default!;
-        public string? Description { get;  set; } = default!;
+        public int ProjectId { get; set; }
 
-        public DateOnly? StartDate { get;  set; }
-        public DateOnly? EndDate { get;  set; }
+        public string Name { get; set; } = default!;
+        public string? Description { get; set; }
 
-        public string? CreatedBy { get;  set; } = default!;
-        public bool?  IsActive { get;  set; }
+        public DateTime? StartDate { get; set; }
+        public DateTime? EndDate { get; set; }
+
+        public string? CreatedBy { get; set; }
+        public bool? IsActive { get; set; }
+
         public DateTime? CreatedAt { get; set; }
         public DateTime? UpdatedAt { get; set; }
-        
-        public ProjectEntity() { } // for persistence
+
+        // Required for EF or Dapper materialization
+        public ProjectEntity() { }
 
         public ProjectEntity(
             int projectId,
             string name,
             string? description,
-            DateOnly? startDate,
-            DateOnly? endDate,
-            string createdBy,
-            bool isActive, DateTime createdAt = default, DateTime updatedAt = default)
+            DateTime? startDate,
+            DateTime? endDate,
+            string? createdBy,
+            bool? isActive,
+            DateTime? createdAt = null,
+            DateTime? updatedAt = null)
         {
             ProjectId = projectId;
             Name = name;
@@ -32,11 +37,11 @@
             EndDate = endDate;
             CreatedBy = createdBy;
             IsActive = isActive;
+            CreatedAt = createdAt;
+            UpdatedAt = updatedAt;
         }
 
-        // Example behaviour: mark active/inactive
         public void Activate() => IsActive = true;
         public void Deactivate() => IsActive = false;
     }
-
 }

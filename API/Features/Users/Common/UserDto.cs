@@ -9,5 +9,9 @@
         public DateTime? CreatedAt { get; init; }
         public DateTime? UpdatedAt { get; init; }
     }
-
+    public class UserRoleDto
+    {
+        public int RoleId { get; set; }
+        public string RoleName { get; set; } = string.Empty;
+    }
 }

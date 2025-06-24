@@ -10,3 +10,7 @@ FROM
     sys.procedures p
 ORDER BY 
     [Schema], [ProcedureName];
+
+
+ --  list all the tables in a SQL Server database:
+ SELECT TABLE_SCHEMA, TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE = 'BASE TABLE';

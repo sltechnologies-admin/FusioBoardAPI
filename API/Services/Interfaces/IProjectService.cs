@@ -1,9 +1,15 @@
-﻿using API.Features.Projects.Common;
+﻿using API.Common.Models;
+using API.Features.Projects.Common;
+using API.Features.Projects.Entities;
+using API.Features.Users.Common;
 
 namespace API.Services.Interfaces
 {
     public interface IProjectService
     {
-        Task<ProjectDto?> GetProjectByIdAsync(int id);
+        Task<Result<ProjectDto>> GetByIdAsync(int id);
+        Task<Result<List<ProjectDto>>> GetAllAsync();
+        Task<Result<bool>> UpdateAsync(UpdateProjectRequest request);
+
     }
 }

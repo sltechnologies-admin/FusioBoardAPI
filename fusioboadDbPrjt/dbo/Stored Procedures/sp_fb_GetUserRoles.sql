@@ -1,5 +1,5 @@
 ﻿CREATE PROCEDURE [dbo].[sp_fb_GetUserRoles]
-    @UserId INT
+    @id INT
 AS
 BEGIN
     SET NOCOUNT ON;
@@ -14,5 +14,5 @@ BEGIN
         ur.AssignedAt
     FROM UserRoles ur
     INNER JOIN Roles r ON ur.RoleId = r.RoleId
-    WHERE ur.UserId = @UserId;
+    WHERE ur.UserId = @id;
 END;

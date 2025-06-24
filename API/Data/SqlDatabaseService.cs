@@ -53,7 +53,11 @@ namespace API.Data
             return dataTable;
         }
 
-        public async Task<List<T>> ExecuteReaderAsync<T>(string query, List<SqlParameter> parameters, Func<SqlDataReader, T> map, CommandType commandType = CommandType.Text)
+        public async Task<List<T>> ExecuteReaderAsync<T>(
+            string query,
+            List<SqlParameter> parameters,
+            Func<SqlDataReader, T> map,
+            CommandType commandType = CommandType.Text)
         {
             var results = new List<T>();
 
@@ -69,11 +73,20 @@ namespace API.Data
 
             while (await reader.ReadAsync())
             {
-                results.Add(map(reader));
+                try
+                {
+                    results.Add(map(reader));
+                }
+                catch (Exception ex)
+                {
+                    // 🔥 This is your technical error (e.g. bad DB column value, null, cast failure)
+                    throw new DataException($"Mapping failed for query '{query}': {ex.Message}", ex);
+                }
             }
 
             return results;
         }
+
 
     }
 

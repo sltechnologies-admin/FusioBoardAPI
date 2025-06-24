@@ -1,4 +1,5 @@
-﻿using API.Features.Users.Common;
+﻿using API.Common.Models;
+using API.Features.Users.Common;
 using API.Models.Requests;
 using Azure.Core;
 
@@ -9,10 +10,13 @@ namespace API.Services.Interfaces
         /// <summary>
         /// Retrieves a user by their unique identifier.
         /// </summary>
-        /// <param name="userId">Primary key of the user.</param>
+        /// <param name="id">Primary key of the user.</param>
         /// <returns>User DTO if found; otherwise, null.</returns>
-        Task<UserDto?> GetUserByIdAsync(int userId);
-        Task<IReadOnlyList<UserDto>> GetAllUsersAsync();
+        Task<Result<UserDto>> GetByIdAsync(int id);
+
+        Task<Result<List<UserDto>>> GetAllUsersAsync();
+        Task<Result<List<UserRoleDto>>> GetUserRolesAsync(int id);
+
 
         Task<(bool Success, string ErrorMessage)> UpsertUserAsync(RegisterRequest request);
     }

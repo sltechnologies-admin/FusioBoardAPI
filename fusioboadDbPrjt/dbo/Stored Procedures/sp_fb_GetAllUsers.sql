@@ -1,4 +1,4 @@
-﻿CREATE PROCEDURE [dbo].[sp_fb_GetAllUsers]
+﻿CREATE PROCEDURE [dbo].[sp_fb_User_GetAll]
 AS
 BEGIN
     SELECT 

@@ -1,12 +1,11 @@
-﻿using Microsoft.Data.SqlClient;
+﻿using API.Common.Extensions;
 using API.Data.Interfaces;
+using API.Features.Users.Common;
+using API.Features.Users.Entities;
 using API.Models.Requests;
 using API.Repositories.Interfaces;
+using Microsoft.Data.SqlClient;
 using System.Data;
-using API.Features.Users.Entities;
-using API.Common.Extensions;
-using Microsoft.AspNetCore.Http.HttpResults;
-using Microsoft.AspNetCore.Identity;
 
 namespace API.Repositories
 {
@@ -43,7 +42,7 @@ namespace API.Repositories
             };
 
             await _db.ExecuteNonQueryAsync(
-                "sp_fb_UpsertUser",  // this is passed as 'query'
+                "sp_fb_User_Upsert",  // this is passed as 'query'
                 parameters,
                 CommandType.StoredProcedure
             );
@@ -58,7 +57,7 @@ namespace API.Repositories
 
 
             var res = await _db.ExecuteReaderAsync(
-             "sp_fb_GetUserById",
+             "sp_fb_User_GetById",
              parameters,
              reader =>   new UserEntity{
                 UserId = reader.GetInt32("UserId"),
@@ -76,18 +75,17 @@ namespace API.Repositories
         }
 
 
-        public async Task<IReadOnlyList<UserEntity>> GetAllAsync()
+        public async Task<IReadOnlyList<UserDto>> GetAllAsync()
         {
             try
             {
                 var res = await _db.ExecuteReaderAsync(
-               "sp_fb_GetAllUsers",
+               "sp_fb_User_GetAll",
                new List<SqlParameter>(),
-               reader => new UserEntity {
+               reader => new UserDto {
                   UserId = reader.GetInt32("UserId"),
                   Username = reader.GetString("Username"),
                   Email = reader.GetString("Email"),
-                  PasswordHash = reader.GetString("PasswordHash"),
                   IsActive = reader.GetBoolean("IsActive"),
                   CreatedAt = reader.GetDateTimeOffset("CreatedAt").UtcDateTime,
                   UpdatedAt = reader.GetDateTimeOffset("UpdatedAt").UtcDateTime
@@ -103,6 +101,48 @@ namespace API.Repositories
                 throw;
             }
         }
+
+
+        /*
+         | Feature / Layer         | **DTO** (`UserRoleDto`)                            | **Entity** (`UserRoleEntity`)                     | **ViewModel** (`UserRoleViewModel`)               |
+        | ----------------------- | -------------------------------------------------- | ------------------------------------------------- | ------------------------------------------------- |
+        | **Purpose**             | Transfer data across layers or over network        | Represent table schema, used in domain/data layer | Shape data for the frontend or UI screens         |
+        | **Used In**             | Service ↔ Controller ↔ API Response ↔ Repositories | Domain Layer, Repositories, EF Core Models        | Controllers, Razor Views, React/Angular Bindings  |
+        | **Bound to DB?**        | ❌ No                                               | ✅ Yes                                             | ❌ No                                              |
+        | **Serialization Safe?** | ✅ Yes                                              | ⚠️ Risky (can expose internal structure)          | ✅ Yes                                             |
+        | **Contains Logic?**     | ❌ Never                                            | ✅ Sometimes (business logic/behavior)             | ❌ Never                                           |
+        | **Optimized for?**      | Network I/O, storage response                      | Persistence, transactions                         | UI/UX (input forms, dropdowns, etc.)              |
+        | **Example Use Case**    | Return role list to frontend                       | Add/edit roles in database                        | Bind to a form that assigns a user multiple roles |
+
+        Clarification:
+                    Yes, this repository is DB-bound, because:
+                    It interacts directly with SQL tables and stored procedures.
+                    It uses ADO.NET and SqlDataReader to map results.
+                    However, that does not mean you must use entity models (UserEntity, RoleEntity, etc.) everywhere in the repository
+        🧠 Guiding Principle
+                   Use Entity Models when persisting domain state; use DTOs when querying flat/read-optimized data.
+          */
+        public async Task<List<UserRoleDto>> GetUserRolesAsync(int id)
+        {
+            var parameters = new List<SqlParameter>
+            {
+                 new SqlParameter("@id", id)
+            };
+
+            var roles = await _db.ExecuteReaderAsync(
+                "sp_fb_User_GetRoles",
+                parameters,
+                reader => new UserRoleDto {
+                    RoleId = reader.GetInt32(reader.GetOrdinal("RoleId")),
+                    RoleName = reader.GetString(reader.GetOrdinal("RoleName"))
+                },
+                CommandType.StoredProcedure);
+
+            return roles;
+        }
+
+
+
     }
- }
+}
  

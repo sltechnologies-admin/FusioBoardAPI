@@ -4,6 +4,7 @@ using API.Controllers;
 using API.DAL.DTO;
 using API.Data.Interfaces;
 using API.Models.Requests;
+using API.Services;
 using API.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Data.SqlClient;
@@ -63,40 +64,53 @@ public class UserController : BaseController
     [HttpGet("{id}")]
     public async Task<IActionResult> GetById(int id)
     {
-        var user = await _service.GetUserByIdAsync(id);
+        var user = await _service.GetByIdAsync(id);
         return user != null ? Ok(user) : NotFound();
     }
 
     /// <summary>
-    /// Get all users
+    /// Fetch all roles assigned to a user
     /// </summary>
-    [HttpGet]
-    public async Task<IActionResult> GetAll()
+    /// <param name="id"></param>
+    /// <returns></returns>
+    [HttpGet("{id}/roles")]
+    public async Task<IActionResult> GetUserRoles(int id)
     {
         try
         {
-            var users = await _service.GetAllUsersAsync();
-            //_logger.LogInformation( "[GETALL-SUCCESS-01] CorrelationId: {CorrelationId} - Retrieved {UserCount} users",
-            //    CorrelationId,
-            //    users.Count);
+            var result = await _service.GetUserRolesAsync(id);
+            if (!result.Success)
+                return BadRequest(new { message = result.ErrorMessage });
 
-            return Ok(users);
+            return Ok(result.Data);
         }
         catch (Exception ex)
         {
-            const string eventCode = "GETALL-ERR-01";
+            const string eventCode = "GETROLES-ERR-01";
             await LogHelper.LogErrorAsync(
                 _sqlLogger,
                 eventCode,
                 CorrelationId,
-                "An unexpected error occurred while fetching all users.",
+                Messages.User.e_UnexpectedErrorFetchingUserRoles,
                 ex.Message);
 
-            return StatusCode(
-                HttpStatusCodes.InternalServerError,
+            return StatusCode(HttpStatusCodes.InternalServerError,
                 new { message = "An unexpected error occurred.", correlationId = CorrelationId });
         }
     }
+
+
+    [HttpGet("all")]
+    public async Task<IActionResult> GetAllUsers()
+    {
+        var result = await _service.GetAllUsersAsync();
+
+        if (!result.Success)
+            return BadRequest(new { message = result.ErrorMessage });
+
+        return Ok(result.Data);
+    }
+
 
     /// <summary>
     /// User login
@@ -180,7 +194,7 @@ public class UserController : BaseController
         if (rowsAffected == 0)
             return StatusCode(HttpStatusCodes.InternalServerError, new { message = Messages.User.e_PwdUpdateFailed });
 
-        return Ok(new { message = Messages.User.s_PwdUpdateSuccess });
+        return Ok(new { message = Messages.User.s_PasswordChanged });
     }
 
 

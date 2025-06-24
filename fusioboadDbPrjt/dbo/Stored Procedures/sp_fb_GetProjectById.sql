@@ -1,4 +1,4 @@
-﻿CREATE PROCEDURE [dbo].[sp_fb_GetProjectById]
+﻿CREATE PROCEDURE [dbo].[sp_fb_Project_GetById]
     @id INT = 0
 AS
 BEGIN

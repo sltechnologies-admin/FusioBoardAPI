@@ -1,8 +1,8 @@
 ﻿using API.Common.Logging;
 using API.Constants;
 using API.DAL.DTO;
-using API.Data;
 using API.Data.Interfaces;
+using API.Features.Projects.Common;
 using API.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Data.SqlClient;
@@ -41,7 +41,7 @@ namespace API.Controllers
         [HttpPost("create")]
         public async Task<IActionResult> CreateProject([FromBody] CreateProjectRequest request)
         {
-            if (string.IsNullOrWhiteSpace(request.ProjectName))
+            if (string.IsNullOrWhiteSpace(request.Name))
                 return BadRequest("Project name is required.");
 
             if (request.CreatedBy <= 0)
@@ -56,7 +56,7 @@ namespace API.Controllers
 
             var parameters = new List<SqlParameter>
             {
-        new SqlParameter("@ProjectName", request.ProjectName),
+        new SqlParameter("@ProjectName", request.Name),
         new SqlParameter("@Description", string.IsNullOrEmpty(request.Description) ? DBNull.Value : request.Description),
         new SqlParameter("@StartDate", request.StartDate ?? (object)DBNull.Value),
         new SqlParameter("@EndDate", request.EndDate ?? (object)DBNull.Value),
@@ -212,8 +212,100 @@ namespace API.Controllers
         [HttpGet("{id}")]
         public async Task<IActionResult> GetById(int id)
         {
-            var user = await _service.GetProjectByIdAsync(id);
-            return user != null ? Ok(user) : NotFound();
+            try
+            {
+                var result = await _service.GetByIdAsync(id);
+
+                if (!result.Success)
+                    return NotFound(new { message = result.ErrorMessage });
+
+                return Ok(result.Data);
+            }
+            catch (Exception ex)
+            {
+                const string eventCode = "GETPROJ-ERR-02";
+
+                await LogHelper.LogErrorAsync(
+                    _sqlLogger,
+                    eventCode,
+                    CorrelationId,
+                    Messages.Project.e_UnexpectedErrorFetchingProjectById,
+                    ex.Message);
+
+                return StatusCode(HttpStatusCodes.InternalServerError,
+                    new { message = "An unexpected error occurred.", correlationId = CorrelationId });
+            }
         }
+
+        /// <summary>
+        /// Fetch all projects
+        /// </summary>
+        [HttpGet("all")]
+        public async Task<IActionResult> GetAllProjects()
+        {
+            const string eventCode = EventCodes.Project.FetchAllError;
+            const string userMessage = Messages.Project.e_UnexpectedErrorFetchingProjects;
+
+            try
+            {
+                var result = await _service.GetAllAsync();
+
+                if (!result.Success)
+                {
+                    return await HandleFailureAsync(
+                        eventCode,
+                        result.ErrorMessage,               // user-facing message
+                        result.TechnicalDetails        // technical details
+                    );
+                }
+
+                return Ok(result.Data);
+            }
+            catch (Exception ex)
+            {
+                return await HandleFailureAsync(
+                    eventCode,
+                    userMessage,
+                    ex.ToString(),                // include stack trace in log
+                    logToConsole: true            // log optionally to console if needed
+                );
+            }
+        }
+
+        /// <summary>
+        /// Update an existing project
+        /// </summary>
+        [HttpPut("update")]
+        public async Task<IActionResult> UpdateProject([FromBody] UpdateProjectRequest request)
+        {
+            const string eventCode = EventCodes.Project.UpdateError;
+            const string userMessage = Messages.Project.e_ProjectUpdateFailed;
+
+            try
+            {
+                var result = await _service.UpdateAsync(request);
+
+                if (!result.Success)
+                {
+                    return await HandleFailureAsync(
+                        eventCode,
+                        result.ErrorMessage ?? userMessage,
+                        result.TechnicalDetails
+                    );
+                }
+
+                return Ok(new { message = Messages.Project.s_ProjectUpdated });
+            }
+            catch (Exception ex)
+            {
+                return await HandleFailureAsync(
+                    eventCode,
+                    userMessage,
+                    ex.ToString()
+                );
+            }
+        }
+
+
     }
 }

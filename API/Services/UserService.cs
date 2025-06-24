@@ -1,4 +1,5 @@
-﻿using API.Constants;
+﻿using API.Common.Models;
+using API.Constants;
 using API.Features.Users.Common;
 using API.Models.Requests;
 using API.Repositories;
@@ -16,32 +17,58 @@ namespace API.Services
             _repo = AuthRepository;
         }
 
-        public async Task<UserDto?> GetUserByIdAsync(int userId)
+        public async Task<Result<UserDto>> GetByIdAsync(int id)
         {
-            var entity = await _repo.GetByIdAsync(userId);
-            if (entity == null) return null;
-            return new UserDto {
-                UserId = entity.UserId,
-                Username = entity.Username,
-                Email = entity.Email,
-                IsActive = entity.IsActive
-            };
+            try
+            {
+                var entity = await _repo.GetByIdAsync(id);
+                if (entity == null)
+                    return Result<UserDto>.Fail($"User with ID {id} not found.");
+
+                var resultData = new UserDto {
+                    UserId = entity.UserId,
+                    Username = entity.Username,
+                    Email = entity.Email,
+                    IsActive = entity.IsActive,
+                    CreatedAt = entity.CreatedAt,
+                    UpdatedAt = entity.UpdatedAt
+                };
+
+                return Result<UserDto>.SuccessResult(resultData);
+            }
+            catch (Exception ex)
+            {
+                return Result<UserDto>.Fail("An error occurred while retrieving the user.");
+            }
         }
 
-        public async Task<IReadOnlyList<UserDto>> GetAllUsersAsync()
+
+        public async Task<Result<List<UserDto>>> GetAllUsersAsync()
         {
-            var entities = await _repo.GetAllAsync();
-            return entities
-                .Select(e => new UserDto {
-                    UserId = e.UserId,
-                    Username = e.Username,
-                    Email = e.Email,
-                    IsActive = e.IsActive,
-                    CreatedAt = e.CreatedAt,
-                    UpdatedAt = e.UpdatedAt
-                })
-                .ToList();
+            try
+            {
+                var entities = await _repo.GetAllAsync();
+
+                var resultData = entities
+                    .Select(e => new UserDto {
+                        UserId = e.UserId,
+                        Username = e.Username,
+                        Email = e.Email,
+                        IsActive = e.IsActive,
+                        CreatedAt = e.CreatedAt,
+                        UpdatedAt = e.UpdatedAt
+                    })
+                    .ToList();
+
+                return Result<List<UserDto>>.SuccessResult(resultData);
+            }
+            catch (Exception ex)
+            {
+                return Result<List<UserDto>>.Fail("Failed to retrieve users.");
+            }
         }
+
+
 
         public async Task<(bool Success, string ErrorMessage)> UpsertUserAsync(RegisterRequest request)
         {
@@ -52,6 +79,13 @@ namespace API.Services
             await _repo.UpsertUserAsync(request);
             return (true, null);
         }
+
+        public async Task<Result<List<UserRoleDto>>> GetUserRolesAsync(int userId)
+        {
+            var resultData = await _repo.GetUserRolesAsync(userId);
+            return Result<List<UserRoleDto>>.SuccessResult(resultData);
+        }
+
 
         #region practice
         /* Repository returns an entity

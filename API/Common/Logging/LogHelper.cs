@@ -1,69 +1,79 @@
-﻿
+﻿using Microsoft.Extensions.Logging;
+
 namespace API.Common.Logging
 {
-    #region Best practices 
-    /*
-       - Can we log the input payload - TODO
-       - Middleware adds UserId to every log through structured logging scope 
-    */
-    #endregion
+    /// <summary>
+    /// Centralized helper for logging to SQL and optionally to ILogger.
+    /// </summary>
     public static class LogHelper
     {
+        /// <summary>
+        /// Logs an error-level message to the SQL log store.
+        /// </summary>
         public static async Task LogErrorAsync(
-            //    ILogger logger,
             ISqlLogger sqlLogger,
             string eventCode,
             string correlationId,
-            string message,
-            string ex)
+            string userMessage,
+            string? technicalDetails = null)
         {
-            // 1. Log to built-in ILogger
-            //    logger.LogError(ex, "[{EventCode}] CorrelationId: {CorrelationId} - {Message}", eventCode, correlationId, message);
+            if (sqlLogger == null) throw new ArgumentNullException(nameof(sqlLogger));
 
-            // 2. Log to SQL log table
-            await sqlLogger.LogAsync(new LogEntry {
+            var entry = new LogEntry {
                 LogLevel = "Error",
                 EventCode = eventCode,
                 CorrelationId = correlationId,
-                Message = message,
-                Exception = ex
-            });
+                UserMessage = userMessage,
+                TechnicalDetails = technicalDetails ?? string.Empty
+            };
+
+            await sqlLogger.LogAsync(entry);
         }
 
+        /// <summary>
+        /// Logs a warning-level message.
+        /// </summary>
         public static async Task LogWarningAsync(
-            ILogger logger,
             ISqlLogger sqlLogger,
             string eventCode,
             string correlationId,
-            string message)
+            string warningMessage)
         {
-            //logger.LogWarning("[{EventCode}] CorrelationId: {CorrelationId} - {Message}", eventCode, correlationId, message);
+            if (sqlLogger == null) throw new ArgumentNullException(nameof(sqlLogger));
 
             await sqlLogger.LogAsync(new LogEntry {
                 LogLevel = "Warning",
                 EventCode = eventCode,
                 CorrelationId = correlationId,
-                Message = message,
-                Exception = null
+                UserMessage = warningMessage,
+                TechnicalDetails = null
             });
         }
 
+        /// <summary>
+        /// Logs an info-level message.
+        /// </summary>
         public static async Task LogInfoAsync(
-            ILogger logger,
             ISqlLogger sqlLogger,
             string eventCode,
             string correlationId,
-            string message)
+            string infoMessage)
         {
-            //  logger.LogInformation("[{EventCode}] CorrelationId: {CorrelationId} - {Message}", eventCode, correlationId, message);
+            if (sqlLogger == null) throw new ArgumentNullException(nameof(sqlLogger));
 
             await sqlLogger.LogAsync(new LogEntry {
                 LogLevel = "Information",
                 EventCode = eventCode,
                 CorrelationId = correlationId,
-                Message = message,
-                Exception = null
+                UserMessage = infoMessage,
+                TechnicalDetails = null
             });
         }
+
+        #region Future Enhancements (Suggestions)
+        // - Add overloads with optional payload or request metadata
+        // - Add ability to enrich logs with userId or tenantId from context
+        // - Support structured logging into Serilog or other sinks
+        #endregion
     }
 }

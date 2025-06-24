@@ -1,4 +1,4 @@
-﻿ CREATE PROCEDURE [dbo].[sp_fb_GetAllProjects]
+﻿ CREATE PROCEDURE [dbo].[sp_fb_Project_GetAll]
 AS
 BEGIN
     SET NOCOUNT ON;
