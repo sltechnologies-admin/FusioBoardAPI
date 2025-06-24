@@ -18,10 +18,10 @@ namespace API.Controllers
         private readonly IDatabaseService _db;
 
         private readonly IProjectService _service;
-        private readonly IAppLogger<UserController> _logger;
+        private readonly IAppLogger<ProjectsController> _logger;
         private readonly ISqlLogger _sqlLogger;
 
-        public ProjectsController(IDatabaseService db, ISqlLogger sqlLogger, IAppLogger<UserController> logger, IProjectService service)
+        public ProjectsController(IDatabaseService db, ISqlLogger sqlLogger, IAppLogger<ProjectsController> logger, IProjectService service)
         {
             //coomon 
             _db = db;
@@ -32,7 +32,6 @@ namespace API.Controllers
             _service = service;
         }
 
-
         /// <summary>
         /// Create project
         /// </summary>
@@ -41,53 +40,74 @@ namespace API.Controllers
         [HttpPost("create")]
         public async Task<IActionResult> CreateProject([FromBody] CreateProjectRequest request)
         {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            const string eventCode = "PRJ-CRT-01";
+            const string userMessage =   Messages.Project.e_ProjectCreationFailed;
+
             if (string.IsNullOrWhiteSpace(request.Name))
-                return BadRequest("Project name is required.");
+                return BadRequest(new { message = "Project name is required." });
 
             if (request.CreatedBy <= 0)
-                return BadRequest("Valid CreatedBy user ID is required.");
-
-            const string insertQuery = @"
-        INSERT INTO Projects 
-        (ProjectName, Description, StartDate, EndDate, CreatedBy, CreatedAt, UpdatedAt, IsActive)
-        OUTPUT INSERTED.ProjectId
-        VALUES 
-        (@ProjectName, @Description, @StartDate, @EndDate, @CreatedBy, SYSDATETIMEOFFSET(), SYSDATETIMEOFFSET(), 1);";
-
-            var parameters = new List<SqlParameter>
-            {
-        new SqlParameter("@ProjectName", request.Name),
-        new SqlParameter("@Description", string.IsNullOrEmpty(request.Description) ? DBNull.Value : request.Description),
-        new SqlParameter("@StartDate", request.StartDate ?? (object)DBNull.Value),
-        new SqlParameter("@EndDate", request.EndDate ?? (object)DBNull.Value),
-        new SqlParameter("@CreatedBy", request.CreatedBy)
-    };
+                return BadRequest(new { message = "Valid CreatedBy user ID is required." });
 
             try
             {
-                var projectId = (int)await _db.ExecuteScalarAsync(insertQuery, parameters);
+                var result = await _service.CreateAsync(request);
 
-                return Ok(new
+                if (!result.Success)
                 {
-                    message = "Project created successfully.",
-                    projectId
-                });
-            }
-            catch (SqlException ex) when (ex.Number == 2627) // Unique constraint violation
-            {
-                return Conflict(new { error = "A project with this name already exists." });
-            }
-            catch (SqlException ex)
-            {
-                return StatusCode(HttpStatusCodes.InternalServerError, new { error = "Database error", detail = ex.Message });
+                    await LogHelper.LogErrorAsync(_sqlLogger, eventCode, CorrelationId, userMessage, result.TechnicalDetails);
+                    return BadRequest(new { message = result.ErrorMessage });
+                }
+
+                _logger.LogInformation("[{EventCode}] CorrelationId: {CorrelationId} - Project created: {ProjectName}",
+                    eventCode, CorrelationId, request.Name);
+
+                return Ok(new { message = Messages.Project.s_ProjectCreated, projectId = result.Data });
             }
             catch (Exception ex)
             {
-                return StatusCode(HttpStatusCodes.InternalServerError, new { error = "Unexpected error", detail = ex.Message });
+                await LogHelper.LogErrorAsync(_sqlLogger, eventCode, CorrelationId, userMessage, ex.ToString());
+                return StatusCode(HttpStatusCodes.InternalServerError, new { message = userMessage, correlationId = CorrelationId });
             }
         }
 
+        /// <summary>
+        /// Update an existing project
+        /// </summary>
+        [HttpPut("update")]
+        public async Task<IActionResult> UpdateProject([FromBody] UpdateProjectRequest request)
+        {
+            const string eventCode = "PRJ-ERR-04";// EventCodes.Project.UpdateError;
+            const string userMessage = Messages.Project.e_ProjectUpdateFailed;
 
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+            try
+            {
+                var result = await _service.UpdateAsync(request);
+
+                if (!result.Success)
+                {
+                    return await HandleFailureAsync(
+                        eventCode,
+                        result.ErrorMessage,
+                        result.TechnicalDetails
+                    );
+                }
+                return Ok(new { message = Messages.Project.s_ProjectUpdatedSuccessfully });
+            }
+            catch (Exception ex)
+            {
+                return await HandleFailureAsync(
+                    eventCode,
+                    userMessage,
+                    ex.ToString()
+                );
+            }
+        }
 
         /// <summary>
         /// Assign/edit role for user in project
@@ -271,41 +291,5 @@ namespace API.Controllers
                 );
             }
         }
-
-        /// <summary>
-        /// Update an existing project
-        /// </summary>
-        [HttpPut("update")]
-        public async Task<IActionResult> UpdateProject([FromBody] UpdateProjectRequest request)
-        {
-            const string eventCode = EventCodes.Project.UpdateError;
-            const string userMessage = Messages.Project.e_ProjectUpdateFailed;
-
-            try
-            {
-                var result = await _service.UpdateAsync(request);
-
-                if (!result.Success)
-                {
-                    return await HandleFailureAsync(
-                        eventCode,
-                        result.ErrorMessage ?? userMessage,
-                        result.TechnicalDetails
-                    );
-                }
-
-                return Ok(new { message = Messages.Project.s_ProjectUpdated });
-            }
-            catch (Exception ex)
-            {
-                return await HandleFailureAsync(
-                    eventCode,
-                    userMessage,
-                    ex.ToString()
-                );
-            }
-        }
-
-
     }
 }

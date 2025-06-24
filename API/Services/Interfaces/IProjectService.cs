@@ -7,6 +7,7 @@ namespace API.Services.Interfaces
 {
     public interface IProjectService
     {
+        Task<Result<int>> CreateAsync(CreateProjectRequest request);
         Task<Result<ProjectDto>> GetByIdAsync(int id);
         Task<Result<List<ProjectDto>>> GetAllAsync();
         Task<Result<bool>> UpdateAsync(UpdateProjectRequest request);

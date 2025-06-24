@@ -1,6 +1,7 @@
 ﻿using API.Common.Extensions;
 using API.Common.Models;
 using API.Data.Interfaces;
+using API.Features.Projects.Common;
 using API.Features.Projects.Entities;
 using API.Repositories.Interfaces;
 using Microsoft.Data.SqlClient;
@@ -16,6 +17,44 @@ namespace API.Repositories
         {
             _db = db;
         }
+        
+        public async Task<Result<int>> CreateAsync(CreateProjectRequest request)
+        {
+            var parameters = new List<SqlParameter>
+            {
+        new SqlParameter("@ProjectName", request.Name),
+        new SqlParameter("@Description", string.IsNullOrWhiteSpace(request.Description) ? DBNull.Value : request.Description),
+        new SqlParameter("@StartDate", request.StartDate ?? (object)DBNull.Value),
+        new SqlParameter("@EndDate", request.EndDate ?? (object)DBNull.Value),
+        new SqlParameter("@CreatedBy", request.CreatedBy),
+
+        new SqlParameter
+        {
+            ParameterName = "@ProjectId",
+            SqlDbType = SqlDbType.Int,
+            Direction = ParameterDirection.Output
+        }
+    };
+
+            try
+            {
+                await _db.ExecuteNonQueryAsync("sp_fb_Project_Create", parameters, CommandType.StoredProcedure);
+
+                var outputParam = parameters.First(p => p.ParameterName == "@ProjectId");
+                int projectId = (outputParam.Value != DBNull.Value) ? Convert.ToInt32(outputParam.Value) : 0;
+
+                return Result<int>.SuccessResult(projectId);
+            }
+            catch (SqlException ex) when (ex.Number == 50000 || ex.State == 1) // custom RAISERROR
+            {
+                return Result<int>.Fail("A project with this name already exists.", ex.Message);
+            }
+            catch (Exception ex)
+            {
+                return Result<int>.Fail("An error occurred while creating the project.", ex.ToString());
+            }
+        }
+
 
         public async Task<ProjectEntity?> GetByIdAsync(int id)
         {
@@ -75,36 +114,31 @@ namespace API.Repositories
             return result;
         }
 
-        public async Task<Result<bool>> UpdateAsync(ProjectEntity entity)
+        public async Task<Result<bool>> UpdateAsync(UpdateProjectRequest request)
         {
-            const string storedProc = "sp_fb_Project_Update";
-
             var parameters = new List<SqlParameter>
             {
-                 new("@ProjectId", entity.ProjectId),
-                 new("@ProjectName", entity.Name),
-                 new("@Description", (object?)entity.Description ?? DBNull.Value),
-                 new("@StartDate", entity.StartDate ?? (object)DBNull.Value),
-                 new("@EndDate", entity.EndDate ?? (object)DBNull.Value),
-                 new("@IsActive", entity.IsActive ?? true)
+                  new SqlParameter("@ProjectId", request.ProjectId),
+                  new SqlParameter("@ProjectName", request.Name),
+                  new SqlParameter("@Description", string.IsNullOrWhiteSpace(request.Description) ? DBNull.Value : request.Description),
+                  new SqlParameter("@StartDate", request.StartDate ?? (object)DBNull.Value),
+                  new SqlParameter("@EndDate", request.EndDate ?? (object)DBNull.Value),
+                  new SqlParameter("@IsActive", request.IsActive ?? true),
+                  new SqlParameter("@UpdatedAt", DateTimeOffset.UtcNow)
             };
 
             try
             {
-                int rowsAffected = await _db.ExecuteNonQueryAsync(storedProc, parameters, CommandType.StoredProcedure);
-
-                if (rowsAffected == 0)
-                    return Result<bool>.Fail("Project not found.");
-
+                await _db.ExecuteNonQueryAsync("sp_fb_Project_Update", parameters, CommandType.StoredProcedure);
                 return Result<bool>.SuccessResult(true);
             }
-            catch (SqlException ex) when (ex.Number == 50000 && ex.State == 2) // Duplicate project name
+            catch (SqlException ex) when (ex.Number == 50000 || ex.State == 1)
             {
-                return Result<bool>.Fail("Project name already exists.");
+                return Result<bool>.Fail("Project not found.", ex.Message);
             }
-            catch (SqlException ex) when (ex.Number == 50000 && ex.State == 1) // Not found
+            catch (SqlException ex) when (ex.State == 2)
             {
-                return Result<bool>.Fail("Project not found.");
+                return Result<bool>.Fail("A project with this name already exists.", ex.Message);
             }
             catch (Exception ex)
             {
@@ -112,41 +146,5 @@ namespace API.Repositories
             }
         }
 
-
-        //    public async Task<Result<bool>> UpdateAsync(ProjectEntity entity)
-        //    {
-        //        const string query = @"
-        //    UPDATE Projects
-        //    SET 
-        //        ProjectName = @ProjectName,
-        //        Description = @Description,
-        //        StartDate = @StartDate,
-        //        EndDate = @EndDate,
-        //        IsActive = @IsActive
-        //    WHERE ProjectId = @ProjectId";
-
-        //        var parameters = new List<SqlParameter>
-        //        {
-        //    new("@ProjectId", entity.ProjectId),
-        //    new("@ProjectName", entity.Name),
-        //    new("@Description", (object?)entity.Description ?? DBNull.Value),
-        //    new SqlParameter("@StartDate", entity.StartDate ?? (object)DBNull.Value),
-        //    new SqlParameter("@EndDate", entity.EndDate ??(object) DBNull.Value),
-        //    new("@IsActive", entity.IsActive ?? true)
-        //};
-
-        //        try
-        //        {
-        //            int rowsAffected = await _db.ExecuteNonQueryAsync(query, parameters);
-        //            if (rowsAffected == 0)
-        //                return Result<bool>.Fail("Project not found.");
-
-        //            return Result<bool>.SuccessResult(true);
-        //        }
-        //        catch (Exception ex)
-        //        {
-        //            return Result<bool>.Fail("An error occurred while updating the project.", ex.ToString());
-        //        }
-        //    }
     }
 }

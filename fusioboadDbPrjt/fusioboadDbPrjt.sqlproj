@@ -86,5 +86,6 @@
     <Build Include="dbo\Stored Procedures\sp_fb_Project_GetAll.sql" />
     <Build Include="dbo\Stored Procedures\sp_fb_UserRole_Assign.sql" />
     <Build Include="dbo\Stored Procedures\sp_fb_Project_Update.sql" />
+    <Build Include="dbo\Stored Procedures\sp_fb_Project_Create.sql" />
   </ItemGroup>
 </Project>

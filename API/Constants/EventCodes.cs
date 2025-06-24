@@ -26,12 +26,14 @@
 
         public static class Project
         {
-            public const string CreateError = "PRJ-ERR-01";
-            public const string FetchByIdError = "PRJ-ERR-02";
-            public const string FetchAllError = "PRJ-ERR-03";
-            public const string UpdateError = "PRJ-ERR-04";
+                //Errors 
+                public const string CreateError = "PRJ-CRT-01";
+                public const string UpdateError = "PRJ-ERR-04";
+                public const string FetchAllError = "PRJ-FET-01";
+                public const string FetchByIdError = "PRJ-FET-02";
 
-            public const string AlreadyExistsInfo = "PRJ-INFO-01";
+                // Information 
+                public const string AlreadyExistsInfo = "PRJ-INFO-01";
         }
 
         public static class Role

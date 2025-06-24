@@ -34,8 +34,11 @@
 
         // ---------- Error ----------
         public const string e_ProjectCreationFailed = "Failed to create project.";
-        public const string e_UnexpectedErrorFetchingProjectById = "An error occurred while retrieving the project.";
+
+        public const string s_ProjectUpdatedSuccessfully = "Project updated successfully.";
+        public const string e_UnexpectedErrorUpdatingProject = "An unexpected error occurred while updating the project.";
         public const string e_UnexpectedErrorFetchingProjects = "An error occurred while retrieving project list.";
+        public const string e_UnexpectedErrorFetchingProjectById = "An error occurred while retrieving the project.";
         public const string e_ProjectUpdateFailed = "An error occurred while updating the project.";
         
 

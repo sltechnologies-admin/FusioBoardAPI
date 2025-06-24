@@ -18,6 +18,11 @@ namespace API.Services
             _repo = projectRepository;
         }
 
+        public async Task<Result<int>> CreateAsync(CreateProjectRequest request)
+        {
+            return await _repo.CreateAsync(request);
+        }
+
         public async Task<Result<ProjectDto>> GetByIdAsync(int id)
         {
             try
@@ -75,7 +80,7 @@ namespace API.Services
         }
         public async Task<Result<bool>> UpdateAsync(UpdateProjectRequest request)
         {
-            var entity = new ProjectEntity {
+            var entity = new UpdateProjectRequest {
                 ProjectId = request.ProjectId,
                 Name = request.Name,
                 Description = request.Description,
