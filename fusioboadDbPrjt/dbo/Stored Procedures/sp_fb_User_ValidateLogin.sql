@@ -1,4 +1,4 @@
-﻿CREATE PROCEDURE [dbo].[sp_fb_Validate_UserLogin]
+﻿CREATE PROCEDURE [dbo].[sp_fb_User_ValidateLogin]
     @Username NVARCHAR(100),
     @PasswordHash NVARCHAR(255)
 AS

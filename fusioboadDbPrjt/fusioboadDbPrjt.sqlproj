@@ -62,7 +62,6 @@
   </ItemGroup>
   <ItemGroup>
     <Build Include="dbo\Tables\Users.sql" />
-    <Build Include="dbo\Tables\UserProjectRoles.sql" />
     <Build Include="dbo\Tables\Stories.sql" />
     <Build Include="dbo\Tables\Sprints.sql" />
     <Build Include="dbo\Tables\Roles.sql" />
@@ -75,17 +74,17 @@
     <Build Include="dbo\Tables\Features.sql" />
     <Build Include="dbo\Tables\AuditLogs.sql" />
     <Build Include="dbo\Tables\Epics.sql" />
-    <Build Include="dbo\Stored Procedures\sp_fb_User_Upsert.sql" />
-    <Build Include="dbo\Stored Procedures\sp_fb_User_GetById.sql" />
     <Build Include="dbo\Stored Procedures\sp_fb_User_GetAll.sql" />
     <Build Include="dbo\Stored Procedures\sp_fb_Project_GetById.sql" />
-    <Build Include="dbo\Stored Procedures\sp_fb_User_ValidateLogin.sql" />
     <Build Include="dbo\Tables\UserRoles.sql" />
-    <Build Include="dbo\Stored Procedures\sp_fb_User_GetRoles.sql" />
-    <Build Include="dbo\Stored Procedures\sp_fb_User_GetPermissions.sql" />
     <Build Include="dbo\Stored Procedures\sp_fb_Project_GetAll.sql" />
     <Build Include="dbo\Stored Procedures\sp_fb_UserRole_Assign.sql" />
     <Build Include="dbo\Stored Procedures\sp_fb_Project_Update.sql" />
     <Build Include="dbo\Stored Procedures\sp_fb_Project_Create.sql" />
+    <Build Include="dbo\Stored Procedures\sp_fb_User_ValidateLogin.sql" />
+    <Build Include="dbo\Stored Procedures\sp_fb_User_Upsert.sql" />
+    <Build Include="dbo\Stored Procedures\sp_fb_User_GetRoles.sql" />
+    <Build Include="dbo\Stored Procedures\sp_fb_User_GetPermissions.sql" />
+    <Build Include="dbo\Stored Procedures\sp_fb_User_GetById.sql" />
   </ItemGroup>
 </Project>

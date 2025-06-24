@@ -1,4 +1,4 @@
-﻿CREATE PROCEDURE [dbo].[sp_fb_GetUserPermissions]
+﻿CREATE PROCEDURE [dbo].[sp_fb_User_GetPermissions]
     @UserId INT,
     @ProjectId INT
 AS

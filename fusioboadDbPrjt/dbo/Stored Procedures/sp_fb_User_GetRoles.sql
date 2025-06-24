@@ -1,4 +1,4 @@
-﻿CREATE PROCEDURE [dbo].[sp_fb_GetUserRoles]
+﻿CREATE PROCEDURE [dbo].[sp_fb_User_GetRoles]
     @id INT
 AS
 BEGIN

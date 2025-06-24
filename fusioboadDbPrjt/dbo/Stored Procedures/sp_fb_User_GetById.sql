@@ -1,4 +1,4 @@
-﻿CREATE PROCEDURE [dbo].[sp_fb_GetUserById]
+﻿CREATE PROCEDURE [dbo].[sp_fb_User_GetById]
     @id INT = 0
 AS
 BEGIN
@@ -15,4 +15,3 @@ BEGIN
     FROM Users
     WHERE UserId = @id;
 END
-GO

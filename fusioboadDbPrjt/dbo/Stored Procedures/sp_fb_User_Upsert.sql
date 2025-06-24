@@ -1,4 +1,4 @@
-﻿CREATE PROCEDURE [dbo].[sp_fb_UpsertUser]
+﻿CREATE PROCEDURE [dbo].[sp_fb_User_Upsert]
     @UserId INT = 0, -- Optional: used for update
     @Username NVARCHAR(100),
     @Email NVARCHAR(100),
@@ -60,5 +60,3 @@ BEGIN
         );
     END
 END;
-GO
-
