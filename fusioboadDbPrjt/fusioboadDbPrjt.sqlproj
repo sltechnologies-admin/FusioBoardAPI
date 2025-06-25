@@ -86,5 +86,11 @@
     <Build Include="dbo\Stored Procedures\sp_fb_User_GetRoles.sql" />
     <Build Include="dbo\Stored Procedures\sp_fb_User_GetPermissions.sql" />
     <Build Include="dbo\Stored Procedures\sp_fb_User_GetById.sql" />
+    <Build Include="dbo\Tables\APIMatrix.sql" />
+    <Build Include="dbo\Stored Procedures\sp_fb_Sprints_GetAll_ByProjectId.sql" />
+    <Build Include="dbo\Stored Procedures\sp_fb_Sprints_Get_ById.sql" />
+    <Build Include="dbo\Stored Procedures\sp_fb_Sprints_Delete_ById.sql" />
+    <Build Include="dbo\Stored Procedures\sp_fb_Sprints_Create.sql" />
+    <Build Include="dbo\Stored Procedures\sp_fb_Sprints_Update_ById.sql" />
   </ItemGroup>
 </Project>

@@ -18,6 +18,12 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Files", "Files", "{66F7AC8F
 EndProject
 Project("{00D1A9C2-B5F0-4AF3-8072-F6C62B433612}") = "fusioboadDbPrjt", "fusioboadDbPrjt\fusioboadDbPrjt.sqlproj", "{46D637D3-5E32-41FD-B516-56B6AAF018FA}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "apimetrics", "apimetrics", "{8D9A2080-D01D-4B7D-A286-6384917B15A9}"
+	ProjectSection(SolutionItems) = preProject
+		FilesAndContent\apimetrics\APIMetricsMasterData.sql = FilesAndContent\apimetrics\APIMetricsMasterData.sql
+		chatgptQueryFormart.txt = chatgptQueryFormart.txt
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -41,6 +47,7 @@ Global
 	GlobalSection(NestedProjects) = preSolution
 		{4D12B991-7E98-4231-9056-60B0054A0F6A} = {C9705A52-7B66-4509-AB12-099DC1EBE854}
 		{46D637D3-5E32-41FD-B516-56B6AAF018FA} = {B7942959-0D7C-494A-9006-88B353A08F9C}
+		{8D9A2080-D01D-4B7D-A286-6384917B15A9} = {66F7AC8F-374C-42A0-92D3-7BAD82AB26F1}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {5073DA27-A4A5-46F4-AE3A-B0C76BDE27A6}

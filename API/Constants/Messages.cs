@@ -61,9 +61,14 @@
 
     public static class Sprint
     {
-        // Success
-        public const string s_SprintStarted = "Sprint started successfully.";
-        public const string s_SprintClosed = "Sprint closed successfully.";
+        public const string s_SprintCreated = "Sprint created successfully.";
+        public const string s_SprintUpdatedSuccessfully = "Sprint updated successfully.";
+        public const string s_SprintDeleted = "Sprint deleted successfully.";
+
+        public const string e_SprintCreateFailed = "Unable to create sprint.";
+        public const string e_SprintUpdateFailed = "Unable to update sprint.";
+        public const string e_SprintFetchFailed = "Failed to fetch sprint(s).";
+        public const string e_SprintDeleteFailed = "Failed to delete sprint.";
     }
 }
 

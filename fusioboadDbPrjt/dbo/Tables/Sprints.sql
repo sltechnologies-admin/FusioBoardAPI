@@ -1,13 +1,13 @@
 ﻿CREATE TABLE [dbo].[Sprints] (
-    [SprintId]   INT                NOT NULL,
-    [ProjectId]  INT                NOT NULL,
-    [SprintName] VARCHAR (100)      NOT NULL,
-    [StartDate]  DATE               NOT NULL,
-    [EndDate]    DATE               NOT NULL,
-    [CreatedAt]  DATETIMEOFFSET (7) DEFAULT (sysdatetimeoffset()) NULL,
-    [UpdatedAt]  DATETIMEOFFSET (7) DEFAULT (sysdatetimeoffset()) NULL,
-    PRIMARY KEY CLUSTERED ([SprintId] ASC),
-    FOREIGN KEY ([ProjectId]) REFERENCES [dbo].[Projects] ([ProjectId]) ON DELETE CASCADE,
-    UNIQUE NONCLUSTERED ([ProjectId] ASC, [SprintName] ASC)
+    [Id] INT PRIMARY KEY IDENTITY(1,1),
+    [ProjectId] INT NOT NULL,
+    [Name] NVARCHAR(100) NOT NULL,
+    [Goal] NVARCHAR(500) NULL,
+    [StartDate] DATE NOT NULL,
+    [EndDate] DATE NOT NULL,
+    [IsActive] BIT NOT NULL DEFAULT 1,
+    [CreatedBy] INT,
+    [CreatedOn] DATETIME DEFAULT GETDATE(),
+    [ModifiedBy] INT,
+    [ModifiedOn] DATETIME
 );
-

@@ -1,9 +1,12 @@
-﻿CREATE TABLE Logs (
-    LogId INT IDENTITY PRIMARY KEY,
-    LogLevel NVARCHAR(50),
-    EventCode NVARCHAR(100),
-    CorrelationId UNIQUEIDENTIFIER,
-    UserMessage NVARCHAR(MAX),
-    TechnicalDetails NVARCHAR(MAX),
-    CreatedAt DATETIMEOFFSET DEFAULT SYSDATETIMEOFFSET()
-)
+﻿CREATE TABLE [dbo].[Logs] (
+    [LogId]            INT                IDENTITY (1, 1) NOT NULL,
+    [LogLevel]         VARCHAR (20)       NULL,
+    [EventCode]        VARCHAR (50)       NULL,
+    [CorrelationId]    VARCHAR (100)      NULL,
+    [UserMessage]      NVARCHAR (MAX)     NULL,
+    [TechnicalDetails] NVARCHAR (MAX)     NULL,
+    [CreatedAt]        DATETIMEOFFSET (7) DEFAULT (sysdatetimeoffset()) NULL,
+    PRIMARY KEY CLUSTERED ([LogId] ASC)
+);
+
+

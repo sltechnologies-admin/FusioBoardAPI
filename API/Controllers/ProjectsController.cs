@@ -116,7 +116,7 @@ namespace API.Controllers
         /// <param name="request"></param>
         /// <returns></returns>
         [HttpPost("{projectId}/users/assign-role")]
-        public async Task<IActionResult> AssignRoleToUser(int projectId, [FromBody] AssignRoleRequest request)
+        public async Task<IActionResult> AssignRoleToUserForGivenProject(int projectId, [FromBody] AssignRoleRequest request)
         {
             if (request == null || request.UserId <= 0 || request.RoleId <= 0)
                 return BadRequest("Invalid user or role information.");

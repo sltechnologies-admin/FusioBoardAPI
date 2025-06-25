@@ -36,6 +36,22 @@ namespace API.Common.Extensions
 
         public static DateTimeOffset GetDateTimeOffset(this SqlDataReader r, string name)
            => r.GetDateTimeOffset(r.GetOrdinal(name));
+
+        public static int? GetNullableInt(this SqlDataReader reader, string columnName)
+        {
+            int ordinal = reader.GetOrdinal(columnName);
+            return reader.IsDBNull(ordinal) ? (int?)null : reader.GetInt32(ordinal);
+        }
+        public static DateTime? GetNullableDateTime(this SqlDataReader reader, string columnName)
+        {
+            int ordinal = reader.GetOrdinal(columnName);
+            return reader.IsDBNull(ordinal) ? (DateTime?)null : reader.GetDateTime(ordinal);
+        }
+        public static string? GetNullableString(this SqlDataReader reader, string columnName)
+        {
+            int ordinal = reader.GetOrdinal(columnName);
+            return reader.IsDBNull(ordinal) ? null : reader.GetString(ordinal);
+        }
     }
 
 }

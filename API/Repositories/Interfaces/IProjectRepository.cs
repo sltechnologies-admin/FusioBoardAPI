@@ -8,7 +8,7 @@ namespace API.Repositories.Interfaces
 {
     public interface IProjectRepository
     {
-        Task<Result<int>> CreateAsync(CreateProjectRequest request);
+       Task<Result<int>> CreateAsync(CreateProjectRequest request);
        Task<Result<bool>> UpdateAsync(UpdateProjectRequest request);
 
         Task<ProjectEntity?> GetByIdAsync(int id);

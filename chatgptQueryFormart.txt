@@ -1,0 +1,16 @@
+
+API 
+
+writing desing : IProjectRepository, ProjectRepository,IProjectService,ProjectService, ProjectController 
+feature like models structure 
+
+Next Step: Would you like to continue with:
+DTO and Entity class for Sprint
+ Repository layer with the same Result<T> pattern + implementation
+Service layer
+Controller endpoints
+Or generate insert scripts for dummy sprint data?
+
+
+
+Stored procedure Format: sp_fb_<Entity>_<Action>_<Qualifier>
