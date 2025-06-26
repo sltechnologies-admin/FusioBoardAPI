@@ -1,5 +1,6 @@
 ﻿using API.Data.Interfaces;
 using Microsoft.Data.SqlClient;
+using Microsoft.Extensions.Logging; // <-- Make sure this is included
 using System.Data;
 using System.Text.Json;
 
@@ -8,66 +9,14 @@ namespace API.Common.Logging
     public class SqlLogger : ISqlLogger
     {
         private readonly IDatabaseService _db;
+        private readonly ILogger<SqlLogger> _logger; // <-- Add this
 
-        public SqlLogger(IDatabaseService db)
+        public SqlLogger(IDatabaseService db, ILogger<SqlLogger> logger) // <-- Inject it
         {
             _db = db;
+            _logger = logger;
         }
 
-        //public async Task LogAsync(LogEntry entry)
-        //{
-        //    const string query = @"
-        //INSERT INTO Logs (LogLevel, EventCode, CorrelationId, UserMessage, TechnicalDetails, CreatedAt)
-        //VALUES (@LogLevel, @EventCode, @CorrelationId, @UserMessage, @TechnicalDetails, @CreatedAt)";
-
-        //    var parameters = new List<SqlParameter>
-        //    {
-        //        new SqlParameter("@LogLevel", entry.LogLevel),
-        //        new SqlParameter("@EventCode", entry.EventCode ?? (object)DBNull.Value),
-        //        new SqlParameter("@CorrelationId", entry.CorrelationId ?? (object)DBNull.Value),
-        //        new SqlParameter("@UserMessage", entry.UserMessage ?? (object)DBNull.Value),
-        //        new SqlParameter("@TechnicalDetails", entry.TechnicalDetails ?? (object)DBNull.Value),
-        //        //new SqlParameter("@CreatedAt", entry.CreatedAt)
-        //    };
-
-        //    await _db.ExecuteNonQueryAsync(query, parameters);
-        //}
-
-        #region  exmple: 
-        /* 
-                    🔒 Optional (Final Touches)
-                    
-                    If you want to fully finalize error logging:
-                    ✅ 1. Catch block usage pattern (example)
-                    
-                    Use this consistently:
-                    
-                    try
-                    {
-                    // some business logic
-                    }
-                    catch (Exception ex)
-                    {
-                    await LogHelper.LogErrorAsync(
-                       SqlLogger,
-                       eventCode: EventCodes.e_Project_UpdateFailed,
-                       correlationId: CorrelationId,
-                       userMessage: "Something went wrong while updating the project.",
-                       exceptionDetails: ex.ToString(),
-                       module: LogModules.ProjectManagement,
-                       layer: LogLayers.Controller,
-                       method: nameof(UpdateProject),
-                       requestedBy: "user:krish",
-                       source: "ReactClient",
-                       userId: currentUserId,
-                       inputParams: new { id, dto },
-                       requestUrl: HttpContext?.Request?.Path,
-                       httpMethod: HttpContext?.Request?.Method,
-                       clientIp: HttpContext?.Connection?.RemoteIpAddress?.ToString()
-                    );
-                    }         
-        */
-        #endregion
         public async Task LogAsync(LogEntry entry)
         {
             try
@@ -97,14 +46,12 @@ namespace API.Common.Logging
             }
             catch (Exception ex)
             {
-            #if DEBUG
+#if DEBUG
                 Console.WriteLine($"[LoggingFailure] Could not write to Logs table: {ex.Message}");
-            #else
+#else
                 _logger?.LogError(ex, "Failed to write log entry to SQL");
-            #endif
+#endif
             }
-
         }
-
     }
 }

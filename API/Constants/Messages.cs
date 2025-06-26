@@ -43,7 +43,10 @@
         
 
     }
-
+    public static class Log
+    {
+        public const string e_UnexpectedErrorFetchingLogs = "An unexpected error occurred while fetching logs.";
+    }
     public static class Role
     {
         // Success

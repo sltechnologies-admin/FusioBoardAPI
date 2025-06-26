@@ -43,6 +43,9 @@ builder.Services.AddScoped(typeof(IAppLogger<>), typeof(AppLogger<>));
 builder.Services.AddScoped<ISqlLogger, SqlLogger>();
 builder.Services.AddScoped<ISprintService, SprintService>();
 builder.Services.AddScoped<ISprintRepository, SprintRepository>();
+builder.Services.AddScoped< ILogRepository,LogRepository > ();
+builder.Services.AddScoped<ILogService, LogService>();
+
 
 
 

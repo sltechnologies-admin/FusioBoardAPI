@@ -35,6 +35,10 @@
                 // Information 
                 public const string AlreadyExistsInfo = "PRJ-INFO-01";
         }
+        public static class Log
+        {
+            public const string FetchAllError = "LOG_FETCH_ALL_ERROR";
+        }
 
         public static class Role
         {
