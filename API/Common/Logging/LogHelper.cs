@@ -7,28 +7,43 @@ namespace API.Common.Logging
     /// </summary>
     public static class LogHelper
     {
-        /// <summary>
-        /// Logs an error-level message to the SQL log store.
-        /// </summary>
         public static async Task LogErrorAsync(
             ISqlLogger sqlLogger,
             string eventCode,
             string correlationId,
             string userMessage,
-            string? technicalDetails = null)
-        {
-            if (sqlLogger == null) throw new ArgumentNullException(nameof(sqlLogger));
+            string? exceptionDetails = null,
+            string? module = null,
+            string? layer = null,
+            string? method = null,
+            int? userId = null,
+            string? requestedBy = null,
+            string? source = null,
+            object? inputParams = null,
+            string? requestUrl = null,
+            string? httpMethod = null,
+            string? clientIp = null)
+            {
+                if (sqlLogger == null) throw new ArgumentNullException(nameof(sqlLogger));
 
-            var entry = new LogEntry {
-                LogLevel = "Error",
-                EventCode = eventCode,
-                CorrelationId = correlationId,
-                UserMessage = userMessage,
-                TechnicalDetails = technicalDetails ?? string.Empty
-            };
-
-            await sqlLogger.LogAsync(entry);
-        }
+                await sqlLogger.LogAsync(new LogEntry {
+                    LogLevel = "Error",
+                    EventCode = eventCode,
+                    CorrelationId = correlationId,
+                    UserMessage = userMessage,
+                    TechnicalDetails = exceptionDetails ?? string.Empty,
+                    Module = module,
+                    Layer = layer,
+                    Method = method,
+                    UserId = userId,
+                    RequestedBy = requestedBy,
+                    Source = source,
+                    InputParameters = inputParams,
+                    RequestUrl = requestUrl,
+                    HttpMethod = httpMethod,
+                    ClientIP = clientIp
+                });
+            }
 
         /// <summary>
         /// Logs a warning-level message.
