@@ -58,7 +58,7 @@ namespace API.Controllers
 
                 if (!result.Success)
                 {
-                    await LogHelper.LogErrorAsync(_sqlLogger, eventCode, CorrelationId, userMessage, result.TechnicalDetails);
+                    await LogHelper.LogErrorAsync(_sqlLogger, eventCode, CorrelationId, result.ErrorMessage ?? userMessage, result.TechnicalDetails);
                     return BadRequest(new { message = result.ErrorMessage });
                 }
 

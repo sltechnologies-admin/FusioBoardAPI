@@ -19,29 +19,96 @@ namespace API.Repositories
         }
         public async Task<Result<int>> CreateAsync(SprintCreateDto dto, int userId)
         {
+            try
+            {
+                var parameters = new List<SqlParameter>
+                {
+            new SqlParameter("@projectId", SqlDbType.Int) { Value = dto.ProjectId },
+            new SqlParameter("@name", SqlDbType.NVarChar, 100) { Value = dto.Name },
+            new SqlParameter("@goal", SqlDbType.NVarChar, 500) { Value = string.IsNullOrWhiteSpace(dto.Goal) ? DBNull.Value : dto.Goal },
+            new SqlParameter("@startDate", SqlDbType.Date) { Value = dto.StartDate },
+            new SqlParameter("@endDate", SqlDbType.Date) { Value = dto.EndDate },
+            new SqlParameter("@userId", SqlDbType.Int) { Value = userId }
+        };
+
+                var result = await _db.ExecuteScalarAsync("sp_fb_Sprints_Create", parameters, CommandType.StoredProcedure);
+                int sprintId = Convert.ToInt32(result);
+
+                return Result<int>.SuccessResult(sprintId);
+            }
+            catch (SqlException ex) when (ex.Number == 50000 || ex.State == 1)
+            {
+                var userMessage = $"A sprint with the name '{dto.Name}' already exists in this project.";
+                return Result<int>.Fail(userMessage, "e_sprint_name_conflict" + ex.StackTrace);
+            }
+            catch (Exception ex)
+            {
+                return Result<int>.Fail("e_sprint_create_failed", ex.Message);
+            }
+        }
+
+
+
+        public async Task<Result<int>> CreateAsync_old2(SprintCreateDto dto, int userId)
+        {
+            try
+            {
+                var parameters = new List<SqlParameter>
+                {
+            new SqlParameter("@projectId", SqlDbType.Int) { Value = dto.ProjectId },
+            new SqlParameter("@name", SqlDbType.NVarChar, 100) { Value = dto.Name },
+            new SqlParameter("@goal", SqlDbType.NVarChar, 500) { Value = string.IsNullOrWhiteSpace(dto.Goal) ? DBNull.Value : dto.Goal },
+            new SqlParameter("@startDate", SqlDbType.Date) { Value = dto.StartDate },
+            new SqlParameter("@endDate", SqlDbType.Date) { Value = dto.EndDate },
+            new SqlParameter("@userId", SqlDbType.Int) { Value = userId }
+            };
+
+                var result = await _db.ExecuteScalarAsync("sp_fb_Sprints_Create", parameters, CommandType.StoredProcedure);
+                int sprintId = Convert.ToInt32(result);
+
+                return Result<int>.SuccessResult(sprintId);
+            }
+            catch (SqlException ex) when (ex.Number == 50000 || ex.State == 1)
+            {
+                return Result<int>.Fail("SqlException: e_sprint_create_conflict ", ex.Message);
+            }
+
+            catch (Exception ex)
+            {
+                // Optional: Add logging
+                // await LogHelper.LogErrorAsync(ex, EventCodes.Sprint_Create, Messages.e_Sprint_Create, Modules.Sprint, Layers.Repository, nameof(CreateAsync), userId.ToString(), dto);
+                return Result<int>.Fail("e_sprint_create_failed", ex.Message);
+            }
+        }
+
+
+        public async Task<Result<int>> CreateAsync_old(SprintCreateDto dto, int userId)
+        {
             var parameters = new List<SqlParameter>
             {
-        new SqlParameter("@projectId", dto.ProjectId),
-        new SqlParameter("@name", dto.Name),
-        new SqlParameter("@goal", string.IsNullOrWhiteSpace(dto.Goal) ? DBNull.Value : dto.Goal),
-        new SqlParameter("@startDate", dto.StartDate),
-        new SqlParameter("@endDate", dto.EndDate),
-        new SqlParameter("@userId", userId),
-
-                new SqlParameter
-                {
-                    ParameterName = "@Id",
-                    SqlDbType = SqlDbType.Int,
-                    Direction = ParameterDirection.Output
-                }
+                 new SqlParameter("@projectId", dto.ProjectId),
+                 new SqlParameter("@name", dto.Name),
+                 new SqlParameter("@goal", string.IsNullOrWhiteSpace(dto.Goal) ? DBNull.Value : dto.Goal),
+                 new SqlParameter("@startDate", dto.StartDate),
+                 new SqlParameter("@endDate", dto.EndDate),
+                 new SqlParameter("@userId", userId),
+                //new SqlParameter
+                //{
+                //    ParameterName = "@Id",
+                //    SqlDbType = SqlDbType.Int,
+                //    Direction = ParameterDirection.Output
+                //}
             };
 
             try
             {
                 await _db.ExecuteNonQueryAsync("sp_fb_Sprints_Create", parameters, CommandType.StoredProcedure);
 
-                int sprintId = Convert.ToInt32(parameters.First(p => p.ParameterName == "@Id").Value);
-                return Result<int>.SuccessResult(sprintId);
+                //int sprintId = Convert.ToInt32(parameters.First(p => p.ParameterName == "@Id").Value);
+                //return Result<int>.SuccessResult(sprintId);
+
+                var result = await _db.ExecuteScalarAsync("sp_fb_Sprints_Create", parameters, CommandType.StoredProcedure);
+                return Result<int>.SuccessResult(Convert.ToInt32(result));
             }
             catch (SqlException ex) when (ex.Number == 50000 || ex.State == 1)
             {

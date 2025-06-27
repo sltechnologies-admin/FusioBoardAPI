@@ -31,7 +31,7 @@ namespace API.Controllers
                     eventCode, CorrelationId, userMessage, internalMessage);
             }
 
-            await LogHelper.LogErrorAsync(SqlLogger, eventCode, CorrelationId, userMessage, internalMessage);
+            await LogHelper.LogErrorAsync(SqlLogger, eventCode, CorrelationId,userMessage, internalMessage);
 
             if (isException)
             {

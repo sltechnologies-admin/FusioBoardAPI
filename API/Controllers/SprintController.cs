@@ -21,7 +21,7 @@ namespace API.Controllers
         }
 
         /// <summary>
-        /// Create sprint
+        /// Create sprint: Purpose | Start a sprint
         /// </summary>
         [HttpPost("create")]
         public async Task<IActionResult> Create([FromBody] SprintCreateDto dto)
@@ -39,7 +39,8 @@ namespace API.Controllers
 
                 if (!result.Success)
                 {
-                    await LogHelper.LogErrorAsync(_sqlLogger, eventCode, CorrelationId, userMessage, result.TechnicalDetails);
+                    var errorMessage = result.ErrorMessage ?? userMessage;
+                    await LogHelper.LogErrorAsync(_sqlLogger, eventCode, CorrelationId, result.ErrorMessage ?? userMessage, result.TechnicalDetails);
                     return BadRequest(new { message = result.ErrorMessage });
                 }
 
@@ -56,7 +57,7 @@ namespace API.Controllers
         }
 
         /// <summary>
-        /// Update sprint
+        /// Update sprint | Purpose: Edit name, dates
         /// </summary>
         [HttpPut("update")]
         public async Task<IActionResult> Update([FromBody] SprintUpdateDto dto)
@@ -68,6 +69,7 @@ namespace API.Controllers
             {
                 int userId = 1; // Replace with actual user context
                 var result = await _service.UpdateAsync(dto, userId);
+                //Need to show information, when Sprint Id not exist in db. showing only Success  - will confuse user
 
                 if (!result.Success)
                 {
@@ -83,7 +85,7 @@ namespace API.Controllers
         }
 
         /// <summary>
-        /// Get all sprints for a project
+        /// Get all sprints for a project | Purpose: List sprints
         /// </summary>
         [HttpGet("project/{projectId}")]
         public async Task<IActionResult> GetAllByProjectId(int projectId)
@@ -107,7 +109,7 @@ namespace API.Controllers
         }
 
         /// <summary>
-        /// Get sprint by ID
+        /// Get sprint by ID | Purpose: View sprint
         /// </summary>
         [HttpGet("{id}")]
         public async Task<IActionResult> GetById(int id)
@@ -131,7 +133,7 @@ namespace API.Controllers
         }
 
         /// <summary>
-        /// Delete sprint
+        /// Delete sprint(Sfot) | Purpose: To hide deleted Sprint from User
         /// </summary>
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(int id)
