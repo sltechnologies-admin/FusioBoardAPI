@@ -7,14 +7,24 @@ BEGIN
 
     SELECT 
         LogId,
+        LogLevel,
+        EventCode,
         CorrelationId,
-        ErrorCode,
-        Message,
-        StackTrace,
+        UserMessage,
+        TechnicalDetails,
+        Module,
+        Layer,
+        Method,
+        RequestedBy,
         Source,
-        CreatedOn
+        UserId,
+        InputParameters,
+        RequestUrl,
+        HttpMethod,
+        ClientIP,
+        CreatedAt
     FROM Logs
-    ORDER BY CreatedOn DESC
+    ORDER BY CreatedAt DESC
     OFFSET (@PageNumber - 1) * @PageSize ROWS
     FETCH NEXT @PageSize ROWS ONLY;
 END

@@ -1,6 +1,6 @@
 ﻿CREATE TABLE [dbo].[Logs] (
     [LogId]            INT                IDENTITY (1, 1) NOT NULL,
-    [LogLevel]         VARCHAR (20)       NULL,
+    [LogLevel]         VARCHAR (50)       NULL,
     [EventCode]        VARCHAR (50)       NULL,
     [CorrelationId]    VARCHAR (100)      NULL,
     [UserMessage]      NVARCHAR (MAX)     NULL,

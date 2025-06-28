@@ -93,6 +93,6 @@
     <Build Include="dbo\Stored Procedures\sp_fb_Sprints_Create.sql" />
     <Build Include="dbo\Stored Procedures\sp_fb_Sprints_Update_ById.sql" />
     <Build Include="dbo\Stored Procedures\sp_fb_InsertLog.sql" />
-    <None Include="dbo\Stored Procedures\sp_fb_GetLogs.sql" />
+    <Build Include="dbo\Stored Procedures\sp_fb_GetLogs.sql" />
   </ItemGroup>
 </Project>
