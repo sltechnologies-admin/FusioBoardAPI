@@ -1,5 +1,8 @@
 -- EXEC sp_rename 'UserProjectRoles', 'UserRoles';
 
+select * from Users
+
+select * from Logs
 --  list all the stored procedures in a SQL Server database:
 SELECT 
     SCHEMA_NAME(p.schema_id) AS [Schema],

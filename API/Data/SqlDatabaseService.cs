@@ -87,6 +87,27 @@ namespace API.Data
             return results;
         }
 
+        public async Task ExecuteReaderMultiAsync(string query, List<SqlParameter> parameters,Func<SqlDataReader, Task> handleReaderAsync,CommandType commandType = CommandType.Text)
+        {
+            using var connection = new SqlConnection(_connectionString);
+            using var command = new SqlCommand(query, connection) {
+                CommandType = commandType
+            };
+
+            // Add parameters if any
+            if (parameters?.Any() == true)
+            {
+                command.Parameters.AddRange(parameters.ToArray());
+            }
+
+            await connection.OpenAsync();
+
+            using var reader = await command.ExecuteReaderAsync();
+
+            // Let the caller handle reading multiple result sets
+            await handleReaderAsync(reader);
+        }
+
 
     }
 

@@ -5,6 +5,7 @@ AS
 BEGIN
     SET NOCOUNT ON;
 
+    -- 1. Data Page
     SELECT 
         LogId,
         LogLevel,
@@ -22,10 +23,12 @@ BEGIN
         RequestUrl,
         HttpMethod,
         ClientIP,
-        CreatedAt,
-        TotalCount = COUNT(*) OVER()
+        CreatedAt
     FROM Logs
     ORDER BY CreatedAt DESC
     OFFSET (@PageNumber - 1) * @PageSize ROWS
     FETCH NEXT @PageSize ROWS ONLY;
+
+    -- 2. Total Count
+    SELECT COUNT(*) AS TotalCount FROM Logs;
 END

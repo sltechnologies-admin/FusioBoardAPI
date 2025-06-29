@@ -4,6 +4,6 @@ namespace API.Repositories.Interfaces
 {
     public interface ILogRepository
     {
-        Task<List<LogEntryDto>> GetLogsAsync(int pageNumber, int pageSize);
+        Task<(List<LogEntryDto> Logs, int TotalCount)> GetLogsAsync(int page, int size);
     }
 }

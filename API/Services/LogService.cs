@@ -1,7 +1,7 @@
-﻿using API.Common.Models;
-using API.Features.Logs.Common;
+﻿using API.Features.Logs.Common;
 using API.Repositories.Interfaces;
 using API.Services.Interfaces;
+using System;
 
 namespace API.Services
 {
@@ -14,21 +14,23 @@ namespace API.Services
             _logRepository = logRepository;
         }
 
-        public async Task<Result<List<LogEntryDto>>> GetLogsAsync(int page, int size)
+        /// <summary>
+        /// Fetches paginated log entries and total count from repository.
+        /// </summary>
+        /// <param name="page">The page number (1-based).</param>
+        /// <param name="size">Number of records per page.</param>
+        /// <returns>Tuple: List of log entries and total count.</returns>
+        public async Task<(List<LogEntryDto> Logs, int TotalCount)> GetLogsAsync(int page, int size)
         {
             try
             {
-                var logs = await _logRepository.GetLogsAsync(page, size);
-                return Result<List<LogEntryDto>>.SuccessResult(logs);
+                return await _logRepository.GetLogsAsync(page, size);
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                return Result<List<LogEntryDto>>.Fail(
-                    Messages.Log.e_UnexpectedErrorFetchingLogs,
-                    ex.ToString()
-                );
+                // Optional: Add structured logging here
+                return (new List<LogEntryDto>(), 0); // Safe fallback
             }
         }
-
     }
 }

@@ -2,6 +2,8 @@
 using API.Common.Logging;
 using API.Services.Interfaces;
 using API.Constants;
+using API.Features.Logs.Common;
+using API.Common.Models;
 
 namespace API.Controllers
 {
@@ -9,22 +11,21 @@ namespace API.Controllers
     {
         private readonly ILogService _service;
         private readonly ISqlLogger _sqlLogger;
-        private readonly IAppLogger<SprintController> _logger;
+        private readonly IAppLogger<LogController> _logger;
 
-        public LogController(ILogService service, ISqlLogger sqlLogger, IAppLogger<SprintController> logger)
+        public LogController(ILogService service, ISqlLogger sqlLogger, IAppLogger<LogController> logger)
         {
             _service = service;
             _sqlLogger = sqlLogger;
             _logger = logger;
         }
 
-
         /// <summary>
         /// Fetches system logs with pagination support for admin monitoring.
         /// </summary>
         /// <param name="page">The page number (default is 1).</param>
         /// <param name="size">The number of records per page (default is 20).</param>
-        /// <returns>A paginated list of logs or an appropriate error response.</returns>
+        /// <returns>A paginated list of logs with total count or an error response.</returns>
         [HttpGet("all")]
         public async Task<IActionResult> GetLogs([FromQuery] int page = 1, [FromQuery] int size = 20)
         {
@@ -33,18 +34,11 @@ namespace API.Controllers
 
             try
             {
-                var result = await _service.GetLogsAsync(page, size);
+                var (logs, totalCount) = await _service.GetLogsAsync(page, size);
 
-                if (!result.Success)
-                {
-                    return await HandleFailureAsync(
-                        eventCode,
-                        result.ErrorMessage,
-                        result.TechnicalDetails
-                    );
-                }
+                var result = Result<List<LogEntryDto>>.SuccessResult(logs, totalCount);
 
-                return Ok(result.Data);
+                return Ok(result);
             }
             catch (Exception ex)
             {
@@ -56,8 +50,6 @@ namespace API.Controllers
                 );
             }
         }
-
-
 
     }
 }

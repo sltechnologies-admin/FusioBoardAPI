@@ -13,12 +13,22 @@
         public string? ErrorMessage { get; set; }         // User-facing
         public string? TechnicalDetails { get; set; }     // Internal
         public T? Data { get; set; }
+        public int TotalCount { get; set; } = 0;
 
-        public static Result<T> SuccessResult(T data) =>
-            new Result<T> { Success = true, Data = data };
+        public static Result<T> SuccessResult(T data, int totalCount = 0) =>
+            new Result<T> {
+                Success = true,
+                Data = data,
+                TotalCount = totalCount
+            };
 
         public static Result<T> Fail(string errorMessage, string? technicalDetails = null) =>
-            new Result<T> { Success = false, ErrorMessage = errorMessage, TechnicalDetails = technicalDetails };
+            new Result<T> {
+                Success = false,
+                ErrorMessage = errorMessage,
+                TechnicalDetails = technicalDetails
+            };
     }
+
 
 }

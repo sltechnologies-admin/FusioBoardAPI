@@ -99,7 +99,11 @@ public class UserController : BaseController
         }
     }
 
-
+    /// <summary>
+    /// Get all users
+    /// </summary>
+    /// <param name="id"></param>
+    /// <returns></returns>
     [HttpGet("all")]
     public async Task<IActionResult> GetAllUsers()
     {
