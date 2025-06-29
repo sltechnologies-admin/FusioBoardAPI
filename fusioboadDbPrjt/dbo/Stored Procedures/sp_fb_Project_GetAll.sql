@@ -12,7 +12,8 @@ BEGIN
         CreatedBy,
         CreatedAt,
         UpdatedAt,
-        IsActive
+        IsActive,
+        TotalCount = COUNT(*) OVER()
     FROM Projects
     ORDER BY CreatedAt DESC;
 END;

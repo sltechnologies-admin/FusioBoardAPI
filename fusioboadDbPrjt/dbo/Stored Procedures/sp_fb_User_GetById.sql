@@ -11,7 +11,8 @@ BEGIN
         CreatedAt, 
         UpdatedAt,
         IsEmailVerified,
-        ProfilePicture
+        ProfilePicture,
+        TotalCount = COUNT(*) OVER()
     FROM Users
     WHERE UserId = @id;
 END

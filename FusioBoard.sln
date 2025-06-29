@@ -22,6 +22,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "apimetrics", "apimetrics", 
 	ProjectSection(SolutionItems) = preProject
 		FilesAndContent\apimetrics\APIMetricsMasterData.sql = FilesAndContent\apimetrics\APIMetricsMasterData.sql
 		chatgptQueryFormart.txt = chatgptQueryFormart.txt
+		FilesAndContent\apimetrics\FusioBoard API Collection.postman_collection.json = FilesAndContent\apimetrics\FusioBoard API Collection.postman_collection.json
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "postmanCollections", "postmanCollections", "{5F289E4C-D11E-4939-B379-E20C63AD10F7}"

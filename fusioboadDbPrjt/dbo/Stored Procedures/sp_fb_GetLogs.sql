@@ -22,7 +22,8 @@ BEGIN
         RequestUrl,
         HttpMethod,
         ClientIP,
-        CreatedAt
+        CreatedAt,
+        TotalCount = COUNT(*) OVER()
     FROM Logs
     ORDER BY CreatedAt DESC
     OFFSET (@PageNumber - 1) * @PageSize ROWS

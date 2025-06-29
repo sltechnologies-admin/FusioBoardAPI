@@ -1,0 +1,254 @@
+{
+	"info": {
+		"_postman_id": "6c324cf8-4753-4a91-998f-fd8c2fdd7cc1",
+		"name": "FusioBoard API Collection",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "46242239",
+		"_collection_link": "https://krish-5227065.postman.co/workspace/Krish's-Workspace~2d4cf4fc-7e8d-4aca-85fb-9973f8f53604/collection/46242239-6c324cf8-4753-4a91-998f-fd8c2fdd7cc1?action=share&source=collection_link&creator=46242239"
+	},
+	"item": [
+		{
+			"name": "Local",
+			"item": [
+				{
+					"name": "Sprint Management",
+					"item": [
+						{
+							"name": "Sprint - Create",
+							"request": {
+								"auth": {
+									"type": "noauth"
+								},
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "\r\n/*\r\n{\r\n  \"projectId\": 1,\r\n  \"name\": \"Sprint 2\",\r\n  \"startDate\": \"2025-07-10\",\r\n  \"endDate\": \"2025-07-23\",\r\n  \"goal\": \"Finish project and sprint planning modules\",\r\n  \"createdBy\": 1\r\n}\r\n\r\n{\r\n  \"projectId\": 1,\r\n  \"name\": \"Sprint 2\",\r\n  \"startDate\": \"2025-07-10\",\r\n  \"endDate\": \"2025-07-23\",\r\n  \"goal\": \"Finish project and sprint planning modules\",\r\n  \"createdBy\": 1\r\n}\r\n  */\r\n\r\n  {\r\n  \"projectId\": 1,\r\n  \"name\": \"Sprint 3\",\r\n  \"startDate\": \"2025-07-24\",\r\n  \"endDate\": \"2025-08-06\",\r\n  \"goal\": \"Implement requirement and task modules\",\r\n  \"createdBy\": 1\r\n}\r\n",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "https://localhost:7130/api/Sprint/create",
+									"protocol": "https",
+									"host": [
+										"localhost"
+									],
+									"port": "7130",
+									"path": [
+										"api",
+										"Sprint",
+										"create"
+									]
+								},
+								"description": "Sprint - Create"
+							},
+							"response": []
+						},
+						{
+							"name": "Sprint get all",
+							"protocolProfileBehavior": {
+								"disableBodyPruning": true
+							},
+							"request": {
+								"auth": {
+									"type": "noauth"
+								},
+								"method": "GET",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "https://localhost:7130/api/Sprint/project/1",
+									"protocol": "https",
+									"host": [
+										"localhost"
+									],
+									"port": "7130",
+									"path": [
+										"api",
+										"Sprint",
+										"project",
+										"1"
+									]
+								},
+								"description": "Sprint - Create"
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "Logs",
+					"item": []
+				},
+				{
+					"name": "Project Management",
+					"item": []
+				}
+			]
+		},
+		{
+			"name": "Dev",
+			"item": [
+				{
+					"name": "Sprint Management",
+					"item": [
+						{
+							"name": "Sprint - Create",
+							"request": {
+								"auth": {
+									"type": "noauth"
+								},
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n  \"projectId\": 1,\r\n  \"name\": \"Sprint 4\",\r\n  \"startDate\": \"2025-06-28\",\r\n  \"endDate\": \"2025-07-05\",\r\n  \"goal\": \"Complete core login Func\",\r\n  \"createdBy\":1\r\n}\r\n",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{base_url}}/api/Sprint/create",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"api",
+										"Sprint",
+										"create"
+									]
+								},
+								"description": "Sprint - Create"
+							},
+							"response": []
+						},
+						{
+							"name": "Sprint update",
+							"request": {
+								"auth": {
+									"type": "noauth"
+								},
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n  \"projectId\": 1,\r\n  \"name\": \"Sprint 4\",\r\n  \"startDate\": \"2025-06-28\",\r\n  \"endDate\": \"2025-07-05\",\r\n  \"goal\": \"Complete core login Func\",\r\n  \"createdBy\":1\r\n}\r\n",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{base_url}}/api/Sprint/create",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"api",
+										"Sprint",
+										"create"
+									]
+								},
+								"description": "Sprint - Create"
+							},
+							"response": []
+						},
+						{
+							"name": "Sprint get all",
+							"protocolProfileBehavior": {
+								"disableBodyPruning": true
+							},
+							"request": {
+								"auth": {
+									"type": "noauth"
+								},
+								"method": "GET",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{base_url}}/api/Sprint/project/1",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"api",
+										"Sprint",
+										"project",
+										"1"
+									]
+								},
+								"description": "Sprint - Create"
+							},
+							"response": []
+						},
+						{
+							"name": "get Sprint by id",
+							"protocolProfileBehavior": {
+								"disableBodyPruning": true
+							},
+							"request": {
+								"auth": {
+									"type": "noauth"
+								},
+								"method": "GET",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{base_url}}/api/Sprint/14",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"api",
+										"Sprint",
+										"14"
+									]
+								},
+								"description": "Sprint - Create"
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "Logs",
+					"item": []
+				},
+				{
+					"name": "Project Management",
+					"item": []
+				}
+			]
+		}
+	]
+}

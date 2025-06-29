@@ -10,7 +10,8 @@ BEGIN
         CreatedAt, 
         UpdatedAt,
         IsEmailVerified,
-        ProfilePicture
+        ProfilePicture,
+        TotalCount = COUNT(*) OVER()
     FROM Users;
 END
 GO

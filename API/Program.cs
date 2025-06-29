@@ -9,80 +9,96 @@ using API.Services.Interfaces;
 using System.Reflection;
 
 var builder = WebApplication.CreateBuilder(args);
+
+// ------------------ CORS ------------------
+//builder.Services.AddCors(options =>
+//{
+//    options.AddPolicy("AllowFrontend", policy =>
+//    {
+//        policy.WithOrigins(
+//            "http://localhost:3000",           // Local React dev (Change if using different port)
+//            "https://fusioboard-ui.azurewebsites.net" // Deployed frontend
+//        )
+//        .AllowAnyHeader()
+//        .AllowAnyMethod();
+//        // .AllowCredentials(); // Uncomment if using cookies/auth headers
+//    });
+//});
+
+// Register CORS
 builder.Services.AddCors(options =>
 {
-    //options.AddPolicy("AllowFrontend",
-    //policy =>
-    //{
-    //    policy.WithOrigins("*")//            "https://http://localhost:3001.com") // or "*"
-    //          .AllowAnyHeader()
-    //          .AllowAnyMethod();
-    //});
-    //Replace .AllowAnyOrigin() with .WithOrigins("http://localhost:4200") or your actual frontend domain.
-    options.AddPolicy("AllowAll", policy =>
+    options.AddPolicy("AllowFrontend", policy =>
     {
-        policy
-            .AllowAnyOrigin()
-            .AllowAnyHeader()
-            .AllowAnyMethod();
+        if (builder.Environment.IsDevelopment())
+        {
+            // Local dev: allow everything
+            policy.AllowAnyOrigin()
+                  .AllowAnyHeader()
+                  .AllowAnyMethod();
+        }
+        else
+        {
+            // Production: restrict to specific frontend
+            policy.WithOrigins("https://fusioboard-ui.azurewebsites.net")
+                  .AllowAnyHeader()
+                  .AllowAnyMethod();
+            // .AllowCredentials(); // Only if you're using cookies/auth headers
+        }
     });
 });
 
-// Add services to the container.
 
+// ------------------ Services :Add services to the container.------------------
 builder.Services.AddControllers();
 
-
-// Register here
+// Dependency Injection - Services and Repositories
 builder.Services.AddScoped<IDatabaseService, SqlDatabaseService>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IProjectService, ProjectService>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IProjectRepository, ProjectRepository>();
-builder.Services.AddScoped(typeof(IAppLogger<>), typeof(AppLogger<>));
-builder.Services.AddScoped<ISqlLogger, SqlLogger>();
 builder.Services.AddScoped<ISprintService, SprintService>();
 builder.Services.AddScoped<ISprintRepository, SprintRepository>();
-builder.Services.AddScoped< ILogRepository,LogRepository > ();
+builder.Services.AddScoped<ILogRepository, LogRepository>();
 builder.Services.AddScoped<ILogService, LogService>();
+builder.Services.AddScoped(typeof(IAppLogger<>), typeof(AppLogger<>));
+builder.Services.AddScoped<ISqlLogger, SqlLogger>();
 
-
-
-
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
-builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
-
-//for DAL 
+// Singleton for shared base service
 builder.Services.AddSingleton<SqlDatabaseService>();
 
+// ------------------ Swagger ------------------
+// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
+builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c =>
 {
     var xmlFilename = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
     c.IncludeXmlComments(Path.Combine(AppContext.BaseDirectory, xmlFilename));
 });
 
-
-
-
+// ------------------ App Build ------------------
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
-//if (app.Environment.IsDevelopment())
-//{
+// ------------------ Middleware Pipeline ------------------
+
+// Swagger (enabled always, remove for production if needed)
 app.UseSwagger();
 app.UseSwaggerUI();
-//}
 
 app.UseHttpsRedirection();
 
-app.UseCors("AllowAll"); // Must come before UseAuthorization()
+// CORS must come before authentication/authorization
+app.UseCors("AllowFrontend");
 
 app.UseAuthorization();
 
+// Add correlation ID middleware (for structured logging)
+app.UseMiddleware<CorrelationIdMiddleware>();
+
 app.MapControllers();
 
-//Place it early in the middleware pipeline (right after exception handling).
-app.UseMiddleware<CorrelationIdMiddleware>();
+//Logger: To confirm the current environment at runtime
+app.Logger.LogInformation("Running in {env} environment", builder.Environment.EnvironmentName);
 
 app.Run();

@@ -15,7 +15,8 @@ BEGIN
         CreatedBy,
         CreatedOn,
         ModifiedBy,
-        ModifiedOn
+        ModifiedOn,
+        TotalCount = COUNT(*) OVER()
     FROM Sprints
     WHERE Id = @id AND IsActive = 1;
 END;

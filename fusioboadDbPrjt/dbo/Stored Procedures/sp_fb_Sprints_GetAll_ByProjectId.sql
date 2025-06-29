@@ -15,7 +15,8 @@ BEGIN
         CreatedBy,
         CreatedOn,
         ModifiedBy,
-        ModifiedOn
+        ModifiedOn,
+        TotalCount = COUNT(*) OVER()
     FROM Sprints
     WHERE ProjectId = @projectId AND IsActive = 1
     ORDER BY StartDate DESC;

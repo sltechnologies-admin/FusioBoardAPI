@@ -5,7 +5,7 @@ select Module,count(*) as APICount from APIMatrix group by module
 -- Tables: 
 select   * from Users
 select   * from Projects
-select   * from Sprints
+select   * from Sprints order by name
 select   * from logs  order by CreatedAt desc
  
 select top 3 * from Projectssp_fb_GetAllUsers

@@ -11,7 +11,8 @@ BEGIN
         CreatedBy,
         CreatedAt,
         UpdatedAt,
-        IsActive
+        IsActive,
+        TotalCount = COUNT(*) OVER()
     FROM Projects
     WHERE ProjectId = @id;
 END
