@@ -4,6 +4,7 @@ using API.Constants;
 using API.Data.Interfaces;
 using API.Features.Sprints.Common;
 using API.Services.Interfaces;
+using API.Common.Extensions;
 
 namespace API.Controllers
 {
@@ -122,13 +123,13 @@ namespace API.Controllers
                 var result = await _service.GetByIdAsync(id);
 
                 if (!result.IsSuccess)
-                    return await HandleFailureAsync(eventCode, result.UserErrorMessage, result.TechnicalErrorDetails);
+                    return NotFound(new { message = result.UserErrorMessage });
 
-                return Ok(result.Data);
+                return Ok(result);
             }
             catch (Exception ex)
             {
-                return await HandleFailureAsync(eventCode, userMessage, ex.ToString());
+                return await HandleFailureAsync(eventCode, userMessage, ExceptionHelper.GetDetailedError(ex), isException: true);
             }
         }
 

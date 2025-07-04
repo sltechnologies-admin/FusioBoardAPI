@@ -1,6 +1,7 @@
 ﻿using API.Common.Models;
 using API.Features.Sprints.Common;
 using API.Features.Sprints.Common.API.Features.Sprints.Common;
+using API.Features.Users.Common;
 using API.Repositories.Interfaces;
 using API.Services.Interfaces;
 
@@ -8,16 +9,16 @@ namespace API.Services
 {
     public class SprintService : ISprintService
     {
-        private readonly ISprintRepository _sprintRepository;
+        private readonly ISprintRepository _repo;
 
         public SprintService(ISprintRepository sprintRepository)
         {
-            _sprintRepository = sprintRepository;
+            _repo = sprintRepository;
         }
 
         public async Task<Result<List<SprintResponseDto>>> GetAllByProjectIdAsync(int projectId)
         {
-            var result = await _sprintRepository.GetAllByProjectIdAsync(projectId);
+            var result = await _repo.GetAllByProjectIdAsync(projectId);
 
             if (!result.IsSuccess)
                 return Result<List<SprintResponseDto>>.Fail(result.UserErrorMessage, result.TechnicalErrorDetails);
@@ -35,41 +36,35 @@ namespace API.Services
             return Result<List<SprintResponseDto>>.SuccessResult(mapped);
         }
 
-        public async Task<Result<SprintResponseDto>> GetByIdAsync(int id)
+        public async Task<Result<SprintDto>> GetByIdAsync(int id)
         {
-            var result = await _sprintRepository.GetByIdAsync(id);
+            try
+            {
+                var reporesponse = await _repo.GetByIdAsync(id);
+                if (reporesponse == null)
+                    return Result<SprintDto>.Fail($"Sprint with ID: {id} not found.");
 
-            if (!result.IsSuccess || result.Data == null)
-                return Result<SprintResponseDto>.Fail(result.UserErrorMessage ?? "e_sprint_not_found", result.TechnicalErrorDetails ?? "Sprint not found.");
-
-            var sprint = result.Data;
-
-            var dto = new SprintResponseDto {
-                Id = sprint.Id,
-                ProjectId = sprint.ProjectId,
-                Name = sprint.Name,
-                Goal = sprint.Goal,
-                StartDate = sprint.StartDate,
-                EndDate = sprint.EndDate,
-                IsActive = sprint.IsActive
-            };
-
-            return Result<SprintResponseDto>.SuccessResult(dto);
+                return Result<SprintDto>.SuccessResult(reporesponse, reporesponse.TotalCount);
+            }
+            catch (Exception ex)
+            {
+                return Result<SprintDto>.Fail("An error occurred while retrieving the user.");
+            }
         }
 
         public Task<Result<int>> CreateAsync(SprintCreateDto dto, int userId)
         {
-            return _sprintRepository.CreateAsync(dto, userId);
+            return _repo.CreateAsync(dto, userId);
         }
 
         public Task<Result<int>> UpdateAsync(SprintUpdateDto dto, int userId)
         {
-            return _sprintRepository.UpdateAsync(dto, userId);
+            return _repo.UpdateAsync(dto, userId);
         }
 
         public Task<Result<bool>> DeleteAsync(int id, int userId)
         {
-            return _sprintRepository.DeleteAsync(id, userId);
+            return _repo.DeleteAsync(id, userId);
         }
     }
 }

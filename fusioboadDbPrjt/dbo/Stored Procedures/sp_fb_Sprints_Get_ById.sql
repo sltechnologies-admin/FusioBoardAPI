@@ -16,7 +16,7 @@ BEGIN
         CreatedOn,
         ModifiedBy,
         ModifiedOn,
-        TotalCount = COUNT(*) OVER()
+       (SELECT COUNT(*) FROM Sprints WHERE Id = @id) AS TotalCount
     FROM Sprints
     WHERE Id = @id AND IsActive = 1;
 END;

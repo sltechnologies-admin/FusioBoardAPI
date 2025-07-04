@@ -3,6 +3,7 @@ using API.Common.Models;
 using API.Data.Interfaces;
 using API.Features.Sprints.Common;
 using API.Features.Sprints.Entities;
+using API.Features.Users.Common;
 using API.Repositories.Interfaces;
 using Microsoft.Data.SqlClient;
 using System.Data;
@@ -155,40 +156,29 @@ namespace API.Repositories
             }
         }
 
-        public async Task<Result<SprintEntity?>> GetByIdAsync(int id)
+        public async Task<SprintDto?> GetByIdAsync(int id)
         {
-            try
-            {
                 var parameters = new List<SqlParameter>
                 {
-                new SqlParameter("@id", id)
-            };
+                     new SqlParameter("@id", id)
+                };
 
-                var result = await _db.ExecuteReaderAsync(
+                var res = await _db.ExecuteReaderAsync(
                     "sp_fb_Sprints_Get_ById",
                     parameters,
-                    reader => new SprintEntity {
+                    reader => new SprintDto {
                         Id = reader.GetInt32("Id"),
                         ProjectId = reader.GetInt32("ProjectId"),
                         Name = reader.GetString("Name"),
                         Goal = reader.GetNullableString("Goal"),
+                        TotalCount = reader.GetInt32("TotalCount"), // ✅ Add this only if SP returns it
                         StartDate = reader.GetDateTime("StartDate"),
                         EndDate = reader.GetDateTime("EndDate"),
-                        IsActive = reader.GetBoolean("IsActive"),
-                        CreatedBy = reader.GetNullableInt("CreatedBy"),
-                        CreatedOn = reader.GetDateTime("CreatedOn"),
-                        ModifiedBy = reader.GetNullableInt("ModifiedBy"),
-                        ModifiedOn = reader.GetNullableDateTime("ModifiedOn")
                     },
                     CommandType.StoredProcedure
                 );
 
-                return Result<SprintEntity?>.SuccessResult(result.FirstOrDefault());
-            }
-            catch (Exception ex)
-            {
-                return Result<SprintEntity?>.Fail("e_sprint_get_by_id", $"Failed to fetch sprint {id}. {ex.Message}");
-            }
+                return res.FirstOrDefault();
         }
 
         public async Task<Result<int>> UpdateAsync(SprintUpdateDto dto, int userId)

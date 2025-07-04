@@ -1,6 +1,6 @@
 ﻿namespace API.Features.Users.Common
 {
-    public class UserDto
+    public class UserDto : BaseDto
     {
         public int? UserId { get; init; }
         public string Username { get; init; } = default!;
@@ -8,7 +8,7 @@
         public bool IsActive { get; init; }
         public DateTime? CreatedAt { get; init; }
         public DateTime? UpdatedAt { get; init; }
-        public int? TotalCount { get; init; }
+       
     }
     public class UserRoleDto
     {

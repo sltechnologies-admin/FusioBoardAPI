@@ -48,17 +48,17 @@ namespace API.Repositories
             );
         }
 
+       //Gold  example
         public async Task<UserDto?> GetByIdAsync(int id = 0)
         {
             var parameters = new List<SqlParameter>
             {
-            new SqlParameter("@id", SqlDbType.Int) { Value = id }
+                new SqlParameter("@id", id)
             };
 
             var res = await _db.ExecuteReaderAsync(
              "sp_fb_User_GetById",
              parameters,
-            // reader =>   new UserEntity{
             reader => new UserDto {
                 UserId = reader.GetInt32("UserId"),
                 Username = reader.GetString("Username"),

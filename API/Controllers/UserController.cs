@@ -68,6 +68,8 @@ public class UserController : BaseController
     [HttpGet("{id}")]
     public async Task<IActionResult> GetById(int id)
     {
+        const string eventCode = "GET-ROLES-ERR-01-GETById";
+        const string userMessage = Messages.User.e_UnexpectedErrorFetchingUserRoles;
         try
         {
             var result = await _service.GetByIdAsync(id);
@@ -79,16 +81,7 @@ public class UserController : BaseController
         }
         catch (Exception ex)
         {
-            const string eventCode = "GET-ROLES-ERR-01-GETById";
-            await LogHelper.LogErrorAsync(
-                _sqlLogger,
-                eventCode,
-                CorrelationId,
-                Messages.User.e_UnexpectedErrorFetchingUserRoles,
-                ex.Message);
-
-            return StatusCode(HttpStatusCodes.InternalServerError,
-                new { message = "An unexpected error occurred.", correlationId = CorrelationId });
+            return await HandleFailureAsync(eventCode, userMessage, ExceptionHelper.GetDetailedError(ex), isException: true);
         }
     }
 
