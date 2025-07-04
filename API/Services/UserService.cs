@@ -60,28 +60,30 @@ namespace API.Services
                 return Result<List<UserDto>>.Fail("Failed to retrieve users.");
             }
         }
+        //public async Task<Result<List<UserDto>>> GetAllUsersAsync(int page, int size)
+        //{
+        //        var (users, totalCount) = await _repo.GetAllAsync(page, size);
+
+        //        var mappedUsers = users.Select(u => new UserDto {
+        //            UserId = u.UserId,
+        //            Username = u.Username,
+        //            Email = u.Email,
+        //            IsActive = u.IsActive,
+        //            CreatedAt = u.CreatedAt,
+        //            UpdatedAt = u.UpdatedAt
+        //        }).ToList();
+
+        //        return Result<List<UserDto>>.SuccessResult(mappedUsers, totalCount);
+        //}
+
         public async Task<Result<List<UserDto>>> GetAllUsersAsync(int page, int size)
         {
-            //try
-            //{
-                var (users, totalCount) = await _repo.GetAllAsync(page, size);
+            var (users, totalCount) = await _repo.GetAllAsync(page, size);
 
-                var mappedUsers = users.Select(u => new UserDto {
-                    UserId = u.UserId,
-                    Username = u.Username,
-                    Email = u.Email,
-                    IsActive = u.IsActive,
-                    CreatedAt = u.CreatedAt,
-                    UpdatedAt = u.UpdatedAt
-                }).ToList();
+            // Use the mapper extension
+            var dtoList = users.ToDtoList();
 
-                return Result<List<UserDto>>.SuccessResult(mappedUsers, totalCount);
-            //}
-            //catch (Exception ex)
-            //{
-            //    var detailedMessage = ExceptionHelper.GetDetailedError(ex);
-            //    return Result<List<UserDto>>.Fail("Failed to retrieve users.", detailedMessage);
-            //}
+            return Result<List<UserDto>>.SuccessResult(dtoList, totalCount);
         }
 
         public async Task<(bool Success, string ErrorMessage)> UpsertUserAsync(RegisterRequest request)

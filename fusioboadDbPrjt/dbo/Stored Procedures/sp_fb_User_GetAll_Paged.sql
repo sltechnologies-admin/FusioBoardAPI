@@ -5,10 +5,7 @@ AS
 BEGIN
     SET NOCOUNT ON;
 
-    -- First result: Total count
-    SELECT COUNT(*) AS TotalCount FROM Users WHERE IsActive = 1;
-
-    -- Second result: Paged data
+    --  First result: Paged data
     SELECT 
         UserId, 
         Username, 
@@ -24,4 +21,7 @@ BEGIN
     ORDER BY CreatedAt DESC
     OFFSET (@Page - 1) * @Size ROWS
     FETCH NEXT @Size ROWS ONLY;
+
+     -- Second result: Total count
+    SELECT COUNT(*) AS TotalCount FROM Users WHERE IsActive = 1;
 END

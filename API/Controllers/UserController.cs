@@ -62,7 +62,7 @@ public class UserController : BaseController
     }
 
     /// <summary>
-    /// Get user by ID
+    /// Get user by ID : : GOLD example
     /// </summary>
 
     [HttpGet("{id}")]
@@ -72,7 +72,7 @@ public class UserController : BaseController
         {
             var result = await _service.GetByIdAsync(id);
 
-            if (!result.IsSccess)
+            if (!result.IsSuccess)
                 return NotFound(new { message = result.UserErrorMessage });
 
             return Ok(result);
@@ -103,7 +103,7 @@ public class UserController : BaseController
         try
         {
             var result = await _service.GetUserRolesAsync(id);
-            if (!result.IsSccess)
+            if (!result.IsSuccess)
                 return BadRequest(new { message = result.UserErrorMessage });
 
             return Ok(result.Data);
@@ -128,7 +128,7 @@ public class UserController : BaseController
     /// </summary>
     /// <param name="id"></param>
     /// <returns></returns>
-    [HttpGet("all")]
+    [HttpGet("all-old")]
     public async Task<IActionResult> GetAll()
     {
         var result = await _service.GetAllUsersAsync();
@@ -139,29 +139,33 @@ public class UserController : BaseController
         return Ok(result);        
     }
 
-
-    [HttpGet("v2/all")]
+    /// <summary>
+    /// Get all users : GOLD example
+    /// </summary>
+    /// <param name="id"></param>
+    /// <returns></returns>
+    [HttpGet("all")]
     public async Task<IActionResult> GetAllUsers(int page = 1, int size = 10)
     {
         const string eventCode = "GET-Users-ERR-Controller-GETById";
-        string userMessage = "";
+        string userMessage = "An unexpected error occurred while fetching users.";
         try
         {
             var result = await _service.GetAllUsersAsync(page, size);
 
-            //if (!result.Success)
-            //{
-            //    return BadRequest(new {
-            //        message = result.ErrorMessage,
-            //        technicalDetails = eventCode  
-            //    });
-            //}
-
+            if (!result.IsSuccess)
+            {
+                return BadRequest(new {
+                    message = result.UserErrorMessage,
+                    correlationId = CorrelationId,
+                    eventCode
+                });
+            }
             return Ok(result);
         }
         catch (Exception ex)
         {
-            return await HandleFailureAsync(eventCode,ex.Message, ExceptionHelper.GetDetailedError(ex), isException: true);
+            return await HandleFailureAsync(eventCode, userMessage, ExceptionHelper.GetDetailedError(ex), isException: true);
         }
     }
 

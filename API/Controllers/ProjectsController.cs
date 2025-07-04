@@ -56,7 +56,7 @@ namespace API.Controllers
             {
                 var result = await _service.CreateAsync(request);
 
-                if (!result.IsSccess)
+                if (!result.IsSuccess)
                 {
                     await LogHelper.LogErrorAsync(_sqlLogger, eventCode, CorrelationId, result.UserErrorMessage ?? userMessage, result.TechnicalErrorDetails);
                     return BadRequest(new { message = result.UserErrorMessage });
@@ -89,7 +89,7 @@ namespace API.Controllers
             {
                 var result = await _service.UpdateAsync(request);
 
-                if (!result.IsSccess)
+                if (!result.IsSuccess)
                 {
                     return await HandleFailureAsync(
                         eventCode,
@@ -236,7 +236,7 @@ namespace API.Controllers
             {
                 var result = await _service.GetByIdAsync(id);
 
-                if (!result.IsSccess)
+                if (!result.IsSuccess)
                     return NotFound(new { message = result.UserErrorMessage });
 
                 return Ok(result.Data);
@@ -270,7 +270,7 @@ namespace API.Controllers
             {
                 var result = await _service.GetAllAsync();
 
-                if (!result.IsSccess)
+                if (!result.IsSuccess)
                 {
                     return await HandleFailureAsync(
                         eventCode,

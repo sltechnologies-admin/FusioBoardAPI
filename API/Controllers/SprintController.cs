@@ -37,7 +37,7 @@ namespace API.Controllers
                 int userId = 1; // Replace with actual context
                 var result = await _service.CreateAsync(dto, userId);
 
-                if (!result.IsSccess)
+                if (!result.IsSuccess)
                 {
                     var errorMessage = result.UserErrorMessage ?? userMessage;
                     await LogHelper.LogErrorAsync(_sqlLogger, eventCode, CorrelationId, result.UserErrorMessage ?? userMessage, result.TechnicalErrorDetails);
@@ -71,7 +71,7 @@ namespace API.Controllers
                 var result = await _service.UpdateAsync(dto, userId);
                 //Need to show information, when Sprint Id not exist in db. showing only Success  - will confuse user
 
-                if (!result.IsSccess)
+                if (!result.IsSuccess)
                 {
                     return await HandleFailureAsync(eventCode, result.UserErrorMessage, result.TechnicalErrorDetails);
                 }
@@ -97,7 +97,7 @@ namespace API.Controllers
             {
                 var result = await _service.GetAllByProjectIdAsync(projectId);
 
-                if (!result.IsSccess)
+                if (!result.IsSuccess)
                     return await HandleFailureAsync(eventCode, result.UserErrorMessage, result.TechnicalErrorDetails);
 
                 return Ok(result.Data);
@@ -121,7 +121,7 @@ namespace API.Controllers
             {
                 var result = await _service.GetByIdAsync(id);
 
-                if (!result.IsSccess)
+                if (!result.IsSuccess)
                     return await HandleFailureAsync(eventCode, result.UserErrorMessage, result.TechnicalErrorDetails);
 
                 return Ok(result.Data);
@@ -146,7 +146,7 @@ namespace API.Controllers
                 int userId = 1; // Replace with actual user context
                 var result = await _service.DeleteAsync(id, userId);
 
-                if (!result.IsSccess)
+                if (!result.IsSuccess)
                     return await HandleFailureAsync(eventCode, result.UserErrorMessage, result.TechnicalErrorDetails);
 
                 return Ok(new { message = Messages.Sprint.s_SprintDeleted });
