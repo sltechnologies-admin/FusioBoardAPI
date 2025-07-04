@@ -37,11 +37,11 @@ namespace API.Controllers
                 int userId = 1; // Replace with actual context
                 var result = await _service.CreateAsync(dto, userId);
 
-                if (!result.Success)
+                if (!result.IsSccess)
                 {
-                    var errorMessage = result.ErrorMessage ?? userMessage;
-                    await LogHelper.LogErrorAsync(_sqlLogger, eventCode, CorrelationId, result.ErrorMessage ?? userMessage, result.TechnicalDetails);
-                    return BadRequest(new { message = result.ErrorMessage });
+                    var errorMessage = result.UserErrorMessage ?? userMessage;
+                    await LogHelper.LogErrorAsync(_sqlLogger, eventCode, CorrelationId, result.UserErrorMessage ?? userMessage, result.TechnicalErrorDetails);
+                    return BadRequest(new { message = result.UserErrorMessage });
                 }
 
                 _logger.LogInformation("[{EventCode}] CorrelationId: {CorrelationId} - Sprint created: {SprintName}",
@@ -71,9 +71,9 @@ namespace API.Controllers
                 var result = await _service.UpdateAsync(dto, userId);
                 //Need to show information, when Sprint Id not exist in db. showing only Success  - will confuse user
 
-                if (!result.Success)
+                if (!result.IsSccess)
                 {
-                    return await HandleFailureAsync(eventCode, result.ErrorMessage, result.TechnicalDetails);
+                    return await HandleFailureAsync(eventCode, result.UserErrorMessage, result.TechnicalErrorDetails);
                 }
 
                 return Ok(new { message = Messages.Sprint.s_SprintUpdatedSuccessfully });
@@ -97,8 +97,8 @@ namespace API.Controllers
             {
                 var result = await _service.GetAllByProjectIdAsync(projectId);
 
-                if (!result.Success)
-                    return await HandleFailureAsync(eventCode, result.ErrorMessage, result.TechnicalDetails);
+                if (!result.IsSccess)
+                    return await HandleFailureAsync(eventCode, result.UserErrorMessage, result.TechnicalErrorDetails);
 
                 return Ok(result.Data);
             }
@@ -121,8 +121,8 @@ namespace API.Controllers
             {
                 var result = await _service.GetByIdAsync(id);
 
-                if (!result.Success)
-                    return await HandleFailureAsync(eventCode, result.ErrorMessage, result.TechnicalDetails);
+                if (!result.IsSccess)
+                    return await HandleFailureAsync(eventCode, result.UserErrorMessage, result.TechnicalErrorDetails);
 
                 return Ok(result.Data);
             }
@@ -146,8 +146,8 @@ namespace API.Controllers
                 int userId = 1; // Replace with actual user context
                 var result = await _service.DeleteAsync(id, userId);
 
-                if (!result.Success)
-                    return await HandleFailureAsync(eventCode, result.ErrorMessage, result.TechnicalDetails);
+                if (!result.IsSccess)
+                    return await HandleFailureAsync(eventCode, result.UserErrorMessage, result.TechnicalErrorDetails);
 
                 return Ok(new { message = Messages.Sprint.s_SprintDeleted });
             }

@@ -66,7 +66,7 @@ builder.Services.AddScoped(typeof(IAppLogger<>), typeof(AppLogger<>));
 builder.Services.AddScoped<ISqlLogger, SqlLogger>();
 
 // Singleton for shared base service
-builder.Services.AddSingleton<SqlDatabaseService>();
+//builder.Services.AddSingleton<SqlDatabaseService>();
 
 // ------------------ Swagger ------------------
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle

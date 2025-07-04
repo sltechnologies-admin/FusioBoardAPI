@@ -1,13 +1,17 @@
-﻿using API.Common.Logging;
+﻿using API.Common.Extensions;
+using API.Common.Logging;
+using API.Common.Models;
 using API.Constants;
 using API.Controllers;
 using API.DAL.DTO;
 using API.Data.Interfaces;
+using API.Features.Logs.Common;
 using API.Models.Requests;
 using API.Services;
 using API.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Data.SqlClient;
+using System.Drawing;
 
 public class UserController : BaseController
 {
@@ -64,8 +68,28 @@ public class UserController : BaseController
     [HttpGet("{id}")]
     public async Task<IActionResult> GetById(int id)
     {
-        var user = await _service.GetByIdAsync(id);
-        return user != null ? Ok(user) : NotFound();
+        try
+        {
+            var result = await _service.GetByIdAsync(id);
+
+            if (!result.IsSccess)
+                return NotFound(new { message = result.UserErrorMessage });
+
+            return Ok(result);
+        }
+        catch (Exception ex)
+        {
+            const string eventCode = "GET-ROLES-ERR-01-GETById";
+            await LogHelper.LogErrorAsync(
+                _sqlLogger,
+                eventCode,
+                CorrelationId,
+                Messages.User.e_UnexpectedErrorFetchingUserRoles,
+                ex.Message);
+
+            return StatusCode(HttpStatusCodes.InternalServerError,
+                new { message = "An unexpected error occurred.", correlationId = CorrelationId });
+        }
     }
 
     /// <summary>
@@ -79,8 +103,8 @@ public class UserController : BaseController
         try
         {
             var result = await _service.GetUserRolesAsync(id);
-            if (!result.Success)
-                return BadRequest(new { message = result.ErrorMessage });
+            if (!result.IsSccess)
+                return BadRequest(new { message = result.UserErrorMessage });
 
             return Ok(result.Data);
         }
@@ -105,15 +129,42 @@ public class UserController : BaseController
     /// <param name="id"></param>
     /// <returns></returns>
     [HttpGet("all")]
-    public async Task<IActionResult> GetAllUsers()
+    public async Task<IActionResult> GetAll()
     {
         var result = await _service.GetAllUsersAsync();
 
-        if (!result.Success)
-            return BadRequest(new { message = result.ErrorMessage });
+        //if (!result.Success)
+        //    return BadRequest(new { message = result.ErrorMessage });
 
-        return Ok(result.Data);
+        return Ok(result);        
     }
+
+
+    [HttpGet("v2/all")]
+    public async Task<IActionResult> GetAllUsers(int page = 1, int size = 10)
+    {
+        const string eventCode = "GET-Users-ERR-Controller-GETById";
+        string userMessage = "";
+        try
+        {
+            var result = await _service.GetAllUsersAsync(page, size);
+
+            //if (!result.Success)
+            //{
+            //    return BadRequest(new {
+            //        message = result.ErrorMessage,
+            //        technicalDetails = eventCode  
+            //    });
+            //}
+
+            return Ok(result);
+        }
+        catch (Exception ex)
+        {
+            return await HandleFailureAsync(eventCode,ex.Message, ExceptionHelper.GetDetailedError(ex), isException: true);
+        }
+    }
+
 
 
     /// <summary>

@@ -56,10 +56,10 @@ namespace API.Controllers
             {
                 var result = await _service.CreateAsync(request);
 
-                if (!result.Success)
+                if (!result.IsSccess)
                 {
-                    await LogHelper.LogErrorAsync(_sqlLogger, eventCode, CorrelationId, result.ErrorMessage ?? userMessage, result.TechnicalDetails);
-                    return BadRequest(new { message = result.ErrorMessage });
+                    await LogHelper.LogErrorAsync(_sqlLogger, eventCode, CorrelationId, result.UserErrorMessage ?? userMessage, result.TechnicalErrorDetails);
+                    return BadRequest(new { message = result.UserErrorMessage });
                 }
 
                 _logger.LogInformation("[{EventCode}] CorrelationId: {CorrelationId} - Project created: {ProjectName}",
@@ -89,12 +89,12 @@ namespace API.Controllers
             {
                 var result = await _service.UpdateAsync(request);
 
-                if (!result.Success)
+                if (!result.IsSccess)
                 {
                     return await HandleFailureAsync(
                         eventCode,
-                        result.ErrorMessage,
-                        result.TechnicalDetails
+                        result.UserErrorMessage,
+                        result.TechnicalErrorDetails
                     );
                 }
                 return Ok(new { message = Messages.Project.s_ProjectUpdatedSuccessfully });
@@ -236,8 +236,8 @@ namespace API.Controllers
             {
                 var result = await _service.GetByIdAsync(id);
 
-                if (!result.Success)
-                    return NotFound(new { message = result.ErrorMessage });
+                if (!result.IsSccess)
+                    return NotFound(new { message = result.UserErrorMessage });
 
                 return Ok(result.Data);
             }
@@ -270,12 +270,12 @@ namespace API.Controllers
             {
                 var result = await _service.GetAllAsync();
 
-                if (!result.Success)
+                if (!result.IsSccess)
                 {
                     return await HandleFailureAsync(
                         eventCode,
-                        result.ErrorMessage,               // user-facing message
-                        result.TechnicalDetails        // technical details
+                        result.UserErrorMessage,               // user-facing message
+                        result.TechnicalErrorDetails        // technical details
                     );
                 }
 

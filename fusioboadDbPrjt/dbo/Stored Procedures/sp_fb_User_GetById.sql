@@ -12,7 +12,7 @@ BEGIN
         UpdatedAt,
         IsEmailVerified,
         ProfilePicture,
-        TotalCount = COUNT(*) OVER()
+        (SELECT COUNT(*) FROM Users WHERE UserId = @id) AS TotalCount
     FROM Users
     WHERE UserId = @id;
 END

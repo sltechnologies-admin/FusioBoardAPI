@@ -1,10 +1,12 @@
-﻿using API.Common.Models;
+﻿using API.Common.Extensions;
+using API.Common.Models;
 using API.Constants;
 using API.Features.Users.Common;
 using API.Models.Requests;
 using API.Repositories;
 using API.Repositories.Interfaces;
 using API.Services.Interfaces;
+using System.Drawing;
 
 namespace API.Services
 {
@@ -21,20 +23,11 @@ namespace API.Services
         {
             try
             {
-                var entity = await _repo.GetByIdAsync(id);
-                if (entity == null)
-                    return Result<UserDto>.Fail($"User with ID {id} not found.");
+                var reporesponse = await _repo.GetByIdAsync(id);
+                if (reporesponse == null)
+                    return Result<UserDto>.Fail($"User with ID: {id} not found.");
 
-                var resultData = new UserDto {
-                    UserId = entity.UserId,
-                    Username = entity.Username,
-                    Email = entity.Email,
-                    IsActive = entity.IsActive,
-                    CreatedAt = entity.CreatedAt,
-                    UpdatedAt = entity.UpdatedAt
-                };
-
-                return Result<UserDto>.SuccessResult(resultData);
+                return Result<UserDto>.SuccessResult(reporesponse, reporesponse.TotalCount);
             }
             catch (Exception ex)
             {
@@ -67,8 +60,29 @@ namespace API.Services
                 return Result<List<UserDto>>.Fail("Failed to retrieve users.");
             }
         }
+        public async Task<Result<List<UserDto>>> GetAllUsersAsync(int page, int size)
+        {
+            //try
+            //{
+                var (users, totalCount) = await _repo.GetAllAsync(page, size);
 
+                var mappedUsers = users.Select(u => new UserDto {
+                    UserId = u.UserId,
+                    Username = u.Username,
+                    Email = u.Email,
+                    IsActive = u.IsActive,
+                    CreatedAt = u.CreatedAt,
+                    UpdatedAt = u.UpdatedAt
+                }).ToList();
 
+                return Result<List<UserDto>>.SuccessResult(mappedUsers, totalCount);
+            //}
+            //catch (Exception ex)
+            //{
+            //    var detailedMessage = ExceptionHelper.GetDetailedError(ex);
+            //    return Result<List<UserDto>>.Fail("Failed to retrieve users.", detailedMessage);
+            //}
+        }
 
         public async Task<(bool Success, string ErrorMessage)> UpsertUserAsync(RegisterRequest request)
         {

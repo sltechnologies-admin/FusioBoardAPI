@@ -19,8 +19,8 @@ namespace API.Services
         {
             var result = await _sprintRepository.GetAllByProjectIdAsync(projectId);
 
-            if (!result.Success)
-                return Result<List<SprintResponseDto>>.Fail(result.ErrorMessage, result.TechnicalDetails);
+            if (!result.IsSccess)
+                return Result<List<SprintResponseDto>>.Fail(result.UserErrorMessage, result.TechnicalErrorDetails);
 
             var mapped = result.Data.Select(s => new SprintResponseDto {
                 Id = s.Id,
@@ -39,8 +39,8 @@ namespace API.Services
         {
             var result = await _sprintRepository.GetByIdAsync(id);
 
-            if (!result.Success || result.Data == null)
-                return Result<SprintResponseDto>.Fail(result.ErrorMessage ?? "e_sprint_not_found", result.TechnicalDetails ?? "Sprint not found.");
+            if (!result.IsSccess || result.Data == null)
+                return Result<SprintResponseDto>.Fail(result.UserErrorMessage ?? "e_sprint_not_found", result.TechnicalErrorDetails ?? "Sprint not found.");
 
             var sprint = result.Data;
 

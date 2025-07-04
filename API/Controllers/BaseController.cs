@@ -32,16 +32,14 @@ namespace API.Controllers
             }
 
             await LogHelper.LogErrorAsync(SqlLogger, eventCode, CorrelationId,userMessage, internalMessage);
-
-            if (isException)
-            {
                 return StatusCode(HttpStatusCodes.InternalServerError, new {
                     message = "An unexpected error occurred.",
-                    correlationId = CorrelationId
-                });
-            }
+                    correlationId = CorrelationId,
+                    eventCode = eventCode,
+                    userMessage = userMessage,
+                    internalMessage = internalMessage
 
-            return BadRequest(new { message = userMessage });
+                });
         }
     }
 }

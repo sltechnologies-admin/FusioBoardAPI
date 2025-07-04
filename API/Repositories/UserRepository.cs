@@ -48,25 +48,25 @@ namespace API.Repositories
             );
         }
 
-        public async Task<UserEntity?> GetByIdAsync(int id = 0)
+        public async Task<UserDto?> GetByIdAsync(int id = 0)
         {
             var parameters = new List<SqlParameter>
             {
             new SqlParameter("@id", SqlDbType.Int) { Value = id }
             };
 
-
             var res = await _db.ExecuteReaderAsync(
              "sp_fb_User_GetById",
              parameters,
-             reader =>   new UserEntity{
+            // reader =>   new UserEntity{
+            reader => new UserDto {
                 UserId = reader.GetInt32("UserId"),
                 Username = reader.GetString("Username"),
                 Email = reader.GetString("Email"),
-                PasswordHash = reader.GetString("PasswordHash"),
                 IsActive = reader.GetBoolean("IsActive"),
-               CreatedAt = reader.GetDateTimeOffset("CreatedAt").UtcDateTime,
-               UpdatedAt = reader.GetDateTimeOffset("UpdatedAt").UtcDateTime
+                TotalCount = reader.GetInt32("TotalCount"), // ✅ Add this only if SP returns it
+                CreatedAt = reader.GetDateTimeOffset("CreatedAt").UtcDateTime,
+                UpdatedAt = reader.GetDateTimeOffset("UpdatedAt").UtcDateTime 
             },
             CommandType.StoredProcedure
             );
@@ -102,6 +102,47 @@ namespace API.Repositories
             }
         }
 
+        public async Task<(List<UserEntity> list, int TotalCount)> GetAllAsync(int page, int size)
+        {
+            var users = new List<UserEntity>();
+            int totalCount = 0;
+
+            var parameters = new List<SqlParameter>
+            {
+                new SqlParameter("@Page", page),
+                new SqlParameter("@Size", size)
+            };
+
+            await _db.ExecuteReaderMultiAsync(
+                "sp_fb_User_GetAll_Paged",
+                parameters,
+                async reader =>
+                {
+                    // First result set: Users
+                    while (await reader.ReadAsync())
+                    {
+                        users.Add(new UserEntity {
+                            UserId = reader.GetInt32("UserId"),
+                            Username = reader.GetString("Username"),
+                            Email = reader.GetString("Email"),
+                            PasswordHash = reader.GetString("PasswordHash"),
+                            IsActive = reader.GetBoolean("IsActive"),
+                            CreatedAt = reader.GetDateTimeOffset("CreatedAt").UtcDateTime,
+                            UpdatedAt = reader.GetDateTimeOffset("UpdatedAt").UtcDateTime
+                        });
+                    }
+
+                    // Second result set: TotalCount
+                    if (await reader.NextResultAsync() && await reader.ReadAsync())
+                    {
+                        totalCount = reader.GetInt32("TotalCount");
+                    }
+                },
+                CommandType.StoredProcedure
+            );
+
+            return (users, totalCount);
+        }
 
         /*
          | Feature / Layer         | **DTO** (`UserRoleDto`)                            | **Entity** (`UserRoleEntity`)                     | **ViewModel** (`UserRoleViewModel`)               |

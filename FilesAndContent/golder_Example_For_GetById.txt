@@ -1,0 +1,134 @@
+    public class UserDto
+    {
+        public int? UserId { get; init; }
+        public string Username { get; init; } = default!;
+        public string Email { get; init; } = default!;
+        public bool IsActive { get; init; }
+        public DateTime? CreatedAt { get; init; }
+        public DateTime? UpdatedAt { get; init; }
+        public int? TotalCount { get; init; }
+    }
+	
+
+File: UserRepository:
+public async Task<IReadOnlyList<UserDto>> GetAllAsync()
+ {
+     try
+     {
+         var res = await _db.ExecuteReaderAsync(
+        "sp_fb_User_GetAll",
+        new List<SqlParameter>(),
+        reader => new UserDto {
+           UserId = reader.GetInt32("UserId"),
+           Username = reader.GetString("Username"),
+           Email = reader.GetString("Email"),
+           IsActive = reader.GetBoolean("IsActive"),
+           CreatedAt = reader.GetDateTimeOffset("CreatedAt").UtcDateTime,
+           UpdatedAt = reader.GetDateTimeOffset("UpdatedAt").UtcDateTime
+        },
+       CommandType.StoredProcedure
+       );
+
+         return res.ToList();
+     }
+     catch (Exception ex)
+     {
+         string error = ex.Message;
+         throw;
+     }
+ }
+
+File: UserService: 
+ public async Task<Result<UserDto>> GetByIdAsync(int id)
+ {
+     try
+     {
+         var reporesponse = await _repo.GetByIdAsync(id);
+         if (reporesponse == null)
+             return Result<UserDto>.Fail($"User with ID: {id} not found.");
+
+         return Result<UserDto>.SuccessResult(reporesponse, reporesponse.TotalCount);
+     }
+     catch (Exception ex)
+     {
+         return Result<UserDto>.Fail("An error occurred while retrieving the user.");
+     }
+ }
+ 
+ 
+ File UserController : BaseController
+ 
+ /// <summary>
+/// Get user by ID
+/// </summary>
+
+[HttpGet("{id}")]
+public async Task<IActionResult> GetById(int id)
+{
+    try
+    {
+        var result = await _service.GetByIdAsync(id);
+        return result != null ? Ok(result) : NotFound();
+    }
+    catch (Exception ex)
+    {
+        const string eventCode = "GET-ROLES-ERR-01-GETById";
+        await LogHelper.LogErrorAsync(
+            _sqlLogger,
+            eventCode,
+            CorrelationId,
+            Messages.User.e_UnexpectedErrorFetchingUserRoles,
+            ex.Message);
+
+        return StatusCode(HttpStatusCodes.InternalServerError,
+            new { message = "An unexpected error occurred.", correlationId = CorrelationId });
+    }
+}
+
+ 
+ File: BaseController
+ using API.Common.Logging;
+using API.Constants;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
+
+namespace API.Controllers
+{
+    [ApiController]
+    [Route("api/[controller]")]
+    public abstract class BaseController : ControllerBase
+    {
+        protected string CorrelationId =>
+            HttpContext?.Items[HeaderKeys.CorrelationId]?.ToString()
+            ?? HttpContext?.Request.Headers[HeaderKeys.CorrelationId].FirstOrDefault()
+            ?? Guid.NewGuid().ToString();
+
+        protected ISqlLogger SqlLogger =>
+            HttpContext.RequestServices.GetRequiredService<ISqlLogger>();
+
+        protected async Task<IActionResult> HandleFailureAsync(
+            string eventCode,
+            string userMessage,
+            string internalMessage,
+            bool isException = false,
+            bool logToConsole = false)
+        {
+            if (logToConsole)
+            {
+                var logger = HttpContext.RequestServices.GetRequiredService<ILogger<BaseController>>();
+                logger.LogError("[{EventCode}] CorrelationId: {CorrelationId} - {UserMessage} | {Details}",
+                    eventCode, CorrelationId, userMessage, internalMessage);
+            }
+
+            await LogHelper.LogErrorAsync(SqlLogger, eventCode, CorrelationId,userMessage, internalMessage);
+                return StatusCode(HttpStatusCodes.InternalServerError, new {
+                    message = "An unexpected error occurred.",
+                    correlationId = CorrelationId,
+                    eventCode = eventCode,
+                    userMessage = userMessage,
+                    internalMessage = internalMessage
+
+                });
+        }
+    }
+}

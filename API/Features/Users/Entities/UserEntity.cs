@@ -1,6 +1,6 @@
 ﻿namespace API.Features.Users.Entities
 {
-    public class UserEntity
+    public class UserEntity 
     {
         public int? UserId { get;  set; }
         public string Username { get;  set; } = default!;

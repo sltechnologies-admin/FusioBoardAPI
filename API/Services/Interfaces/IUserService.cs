@@ -15,6 +15,7 @@ namespace API.Services.Interfaces
         Task<Result<UserDto>> GetByIdAsync(int id);
 
         Task<Result<List<UserDto>>> GetAllUsersAsync();
+        Task<Result<List<UserDto>>> GetAllUsersAsync(int page = 1, int size = 10);
         Task<Result<List<UserRoleDto>>> GetUserRolesAsync(int id);
         Task<(bool Success, string ErrorMessage)> UpsertUserAsync(RegisterRequest request);
     }

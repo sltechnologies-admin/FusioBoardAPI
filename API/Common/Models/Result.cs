@@ -9,24 +9,24 @@
      */
     public class Result<T>
     {
-        public bool Success { get; set; }
-        public string? ErrorMessage { get; set; }         // User-facing
-        public string? TechnicalDetails { get; set; }     // Internal
+        public int? TotalCount { get; set; }
+        public bool IsSccess { get; set; }
+        public string? UserErrorMessage { get; set; }         // User-facing
+        public string? TechnicalErrorDetails { get; set; }     // Internal
         public T? Data { get; set; }
-        public int TotalCount { get; set; } = 0;
 
-        public static Result<T> SuccessResult(T data, int totalCount = 0) =>
+        public static Result<T> SuccessResult(T data, int? totalCount = 0) =>
             new Result<T> {
-                Success = true,
+                IsSccess = true,
                 Data = data,
                 TotalCount = totalCount
             };
 
         public static Result<T> Fail(string errorMessage, string? technicalDetails = null) =>
             new Result<T> {
-                Success = false,
-                ErrorMessage = errorMessage,
-                TechnicalDetails = technicalDetails
+                IsSccess = false,
+                UserErrorMessage = errorMessage,
+                TechnicalErrorDetails = technicalDetails
             };
     }
 

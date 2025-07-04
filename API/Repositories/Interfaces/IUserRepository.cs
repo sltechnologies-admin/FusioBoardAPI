@@ -1,4 +1,5 @@
-﻿using API.Features.Users.Common;
+﻿using API.Features.Logs.Common;
+using API.Features.Users.Common;
 using API.Features.Users.Entities;
 using API.Models.Requests;
 
@@ -13,8 +14,10 @@ namespace API.Repositories.Interfaces
         /// <returns>
         /// A Task containing the UserEntity if found; otherwise, null.
         /// </returns>
-        Task<UserEntity?> GetByIdAsync(int id);
-        Task<IReadOnlyList<UserDto>> GetAllAsync();
+        Task<UserDto?> GetByIdAsync(int id);
+        Task<IReadOnlyList<UserDto>> GetAllAsync(); 
+        Task<(List<UserEntity> list, int TotalCount)> GetAllAsync(int page, int size);
+        //Task<IReadOnlyList<UserEntity>> GetAllAsync(int page, int size);
         Task<List<UserRoleDto>> GetUserRolesAsync(int id);
         Task<bool> UserExistsAsync(string email, string username);
         Task UpsertUserAsync(RegisterRequest request);
